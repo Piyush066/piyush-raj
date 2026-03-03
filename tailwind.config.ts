@@ -88,6 +88,10 @@ export default {
           "0%": { opacity: "0", transform: "translateX(-40px)" },
           "100%": { opacity: "1", transform: "translateX(0)" },
         },
+        shimmer: {
+          "0%": { backgroundPosition: "200% 0" },
+          "100%": { backgroundPosition: "-200% 0" },
+        },
         "pulse-glow": {
           "0%, 100%": { boxShadow: "0 0 20px hsl(24 95% 53% / 0.3)" },
           "50%": { boxShadow: "0 0 40px hsl(24 95% 53% / 0.6)" },
