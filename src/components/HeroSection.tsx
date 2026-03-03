@@ -144,15 +144,15 @@ const HeroSection = () => {
           >
             <div className="relative">
               {/* Glow ring */}
-              <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-primary/20 via-transparent to-primary/10 blur-2xl animate-[pulse_4s_ease-in-out_infinite]" />
+              <div className="absolute -inset-4 rounded-full bg-gradient-to-br from-primary/20 via-transparent to-primary/10 blur-2xl animate-[pulse_4s_ease-in-out_infinite]" />
 
-              {/* Decorative ring */}
-              <div className="absolute -inset-3 rounded-3xl border border-primary/10" />
-              <div className="absolute -inset-6 rounded-[2rem] border border-primary/5" />
+              {/* Decorative rings */}
+              <div className="absolute -inset-3 rounded-full border border-primary/10" />
+              <div className="absolute -inset-6 rounded-full border border-primary/5" />
 
               {/* Main image container */}
-              <div className="relative w-72 h-[22rem] md:w-80 md:h-[28rem] rounded-2xl overflow-hidden">
-                {/* Orange accent shape behind */}
+              <div className="relative w-72 h-72 md:w-80 md:h-80 lg:w-96 lg:h-96 rounded-full overflow-hidden border-2 border-primary/30">
+                {/* Orange accent glows */}
                 <div className="absolute -right-4 -top-4 w-40 h-40 rounded-full bg-primary/20 blur-2xl" />
                 <div className="absolute -left-4 -bottom-4 w-32 h-32 rounded-full bg-primary/15 blur-2xl" />
 
@@ -163,25 +163,25 @@ const HeroSection = () => {
                 />
 
                 {/* Gradient overlay */}
-                <div className="absolute inset-0 z-20 bg-gradient-to-t from-background via-background/20 to-transparent" />
+                <div className="absolute inset-0 z-20 bg-gradient-to-t from-background/60 via-transparent to-transparent" />
                 <div className="absolute inset-0 z-20 bg-gradient-to-r from-primary/10 via-transparent to-transparent" />
-
-                {/* Floating badge */}
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 1.2 }}
-                  className="absolute bottom-6 left-4 right-4 z-30 glass-card rounded-xl p-3 flex items-center gap-3"
-                >
-                  <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
-                    <Play size={14} className="text-primary-foreground ml-0.5" />
-                  </div>
-                  <div>
-                    <p className="text-foreground text-xs font-semibold">Video Editor</p>
-                    <p className="text-muted-foreground text-[10px]">100+ Projects Done</p>
-                  </div>
-                </motion.div>
               </div>
+
+              {/* Floating badge */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 1.2 }}
+                className="absolute -bottom-2 left-1/2 -translate-x-1/2 z-30 glass-card rounded-xl px-4 py-2.5 flex items-center gap-3 whitespace-nowrap"
+              >
+                <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
+                  <Play size={14} className="text-primary-foreground ml-0.5" />
+                </div>
+                <div>
+                  <p className="text-foreground text-xs font-semibold">Video Editor</p>
+                  <p className="text-muted-foreground text-[10px]">100+ Projects Done</p>
+                </div>
+              </motion.div>
             </div>
           </motion.div>
         </div>
