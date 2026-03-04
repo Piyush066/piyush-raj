@@ -15,6 +15,7 @@ import {
   Target,
   BarChart3,
   Users,
+  PlayCircle,
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -56,6 +57,7 @@ const services = [
         "Professional-grade channel identity",
       ],
       turnaround: "3–5 business days",
+      exampleProject: { title: "Brand Story Documentary", id: "project-brand-story-documentary" },
     },
   },
   {
@@ -95,6 +97,7 @@ const services = [
         "Algorithm-friendly formatting",
       ],
       turnaround: "1–2 business days",
+      exampleProject: { title: "Viral Product Launch Reel", id: "project-viral-product-launch-reel" },
     },
   },
   {
@@ -134,6 +137,7 @@ const services = [
         "Higher production value across content",
       ],
       turnaround: "4–7 business days",
+      exampleProject: { title: "Animated Logo Reveal", id: "project-animated-logo-reveal" },
     },
   },
   {
@@ -173,6 +177,7 @@ const services = [
         "Scalable ad production pipeline",
       ],
       turnaround: "2–4 business days",
+      exampleProject: { title: "E-commerce Ad Campaign", id: "project-e-commerce-ad-campaign" },
     },
   },
   {
@@ -212,6 +217,7 @@ const services = [
         "Scalable content system",
       ],
       turnaround: "2–3 business days",
+      exampleProject: { title: "Podcast Highlight Clips", id: "project-podcast-highlight-clips" },
     },
   },
   {
@@ -251,6 +257,7 @@ const services = [
         "Higher RPM & ad revenue",
       ],
       turnaround: "3–5 business days",
+      exampleProject: { title: "Instagram Growth Series", id: "project-instagram-growth-series" },
     },
   },
 ];
@@ -405,6 +412,39 @@ const ServiceModal = ({
                 ))}
               </div>
             </SectionCard>
+
+            {/* 7. See Real Example */}
+            <div className="rounded-xl bg-primary/5 border border-primary/20 p-4 flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+                  <PlayCircle size={16} className="text-primary" />
+                </div>
+                <div>
+                  <p className="text-xs font-heading font-bold text-primary uppercase tracking-widest">
+                    See Real Example
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {service.details.exampleProject.title}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  onClose();
+                  setTimeout(() => {
+                    const el = document.getElementById(service.details.exampleProject.id);
+                    if (el) {
+                      el.scrollIntoView({ behavior: "smooth", block: "center" });
+                      el.classList.add("ring-2", "ring-primary", "ring-offset-2", "ring-offset-background");
+                      setTimeout(() => el.classList.remove("ring-2", "ring-primary", "ring-offset-2", "ring-offset-background"), 2000);
+                    }
+                  }, 350);
+                }}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-secondary border border-border text-xs font-semibold text-foreground hover:border-primary/40 hover:text-primary transition-all shrink-0"
+              >
+                View Project <ArrowUpRight size={12} />
+              </button>
+            </div>
 
             {/* Footer: Turnaround + CTA */}
             <div className="flex items-center justify-between pt-4 border-t border-border">
