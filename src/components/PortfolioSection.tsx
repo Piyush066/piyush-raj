@@ -1,180 +1,53 @@
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import { useRef, useState } from "react";
-import { Play, X, TrendingUp, Eye, BarChart3, ExternalLink } from "lucide-react";
+import { Play, X, ExternalLink } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-const categories = ["All", "YouTube Edits", "Reels & Shorts", "Ad Creatives", "Motion Graphics"];
+const categories = ["All", "Brand Videos", "Reels & Shorts", "YouTube Videos", "Ads & UGC"];
 
 const categoryShowcase: Record<string, { label: string; title: string }> = {
-  "YouTube Edits": { label: "YOUTUBE EDITS", title: "Long-Form Showcase" },
+  "Brand Videos": { label: "BRAND VIDEOS", title: "Brand Video Showcase" },
   "Reels & Shorts": { label: "REELS & SHORTS", title: "Viral Reels Showcase" },
-  "Ad Creatives": { label: "AD CREATIVES", title: "Ad Campaign Showcase" },
-  "Motion Graphics": { label: "MOTION GRAPHICS", title: "Motion Design Showcase" },
+  "YouTube Videos": { label: "YOUTUBE VIDEOS", title: "YouTube Showcase" },
+  "Ads & UGC": { label: "ADS & UGC", title: "Ad Campaign Showcase" },
 };
 
 interface Project {
   title: string;
   category: string;
-  stat: string;
-  statIcon: React.ElementType;
-  desc: string;
   color: string;
   videoUrl?: string;
 }
 
 const projects: Project[] = [
-  {
-    title: "Brand Story Documentary",
-    category: "YouTube Edits",
-    stat: "+45% retention rate",
-    statIcon: TrendingUp,
-    desc: "Cinematic storytelling that captivated audiences and boosted subscriber growth by 32%.",
-    color: "from-primary/30 via-primary/10 to-transparent",
-    videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
-  },
-  {
-    title: "Podcast Highlight Clips",
-    category: "YouTube Edits",
-    stat: "+120% engagement",
-    statIcon: BarChart3,
-    desc: "Bite-sized highlights that expanded audience reach across multiple platforms.",
-    color: "from-orange-600/30 via-primary/10 to-transparent",
-    videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
-  },
-  {
-    title: "Creator Vlog Series",
-    category: "YouTube Edits",
-    stat: "1.2M+ views",
-    statIcon: Eye,
-    desc: "Dynamic vlog editing with jump cuts and b-roll that kept viewers watching till the end.",
-    color: "from-primary/20 via-amber-500/10 to-transparent",
-    videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
-  },
-  {
-    title: "Tutorial Masterclass Edit",
-    category: "YouTube Edits",
-    stat: "+68% watch time",
-    statIcon: TrendingUp,
-    desc: "Educational content with clean graphics and pacing that maximized viewer retention.",
-    color: "from-amber-600/20 via-primary/10 to-transparent",
-    videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
-  },
-  {
-    title: "Viral Product Launch Reel",
-    category: "Reels & Shorts",
-    stat: "2.5M+ views",
-    statIcon: Eye,
-    desc: "Trend-driven editing with dynamic pacing that drove massive organic reach.",
-    color: "from-orange-500/30 via-amber-500/10 to-transparent",
-    videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
-  },
-  {
-    title: "Instagram Growth Series",
-    category: "Reels & Shorts",
-    stat: "500K+ reach",
-    statIcon: Eye,
-    desc: "Consistently viral content series that tripled follower growth rate.",
-    color: "from-amber-500/30 via-orange-600/10 to-transparent",
-    videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
-  },
-  {
-    title: "Trending Audio Montage",
-    category: "Reels & Shorts",
-    stat: "1.8M+ plays",
-    statIcon: Eye,
-    desc: "Perfectly synced transitions to trending audio that exploded on Instagram and TikTok.",
-    color: "from-primary/25 via-orange-500/10 to-transparent",
-    videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
-  },
-  {
-    title: "Before & After Reveal",
-    category: "Reels & Shorts",
-    stat: "850K+ views",
-    statIcon: Eye,
-    desc: "Dramatic reveal editing style that hooked viewers in the first second.",
-    color: "from-orange-600/25 via-amber-500/10 to-transparent",
-    videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
-  },
-  {
-    title: "E-commerce Ad Campaign",
-    category: "Ad Creatives",
-    stat: "3.2x ROAS",
-    statIcon: BarChart3,
-    desc: "Performance-focused creative that converted browsers into buyers.",
-    color: "from-amber-500/30 via-orange-500/10 to-transparent",
-    videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
-  },
-  {
-    title: "SaaS Product Demo Ad",
-    category: "Ad Creatives",
-    stat: "2.1x CTR",
-    statIcon: BarChart3,
-    desc: "Clean, benefit-driven ad creative that outperformed industry benchmarks.",
-    color: "from-primary/25 via-amber-500/10 to-transparent",
-    videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
-  },
-  {
-    title: "Fashion Brand Spot",
-    category: "Ad Creatives",
-    stat: "4.5x ROAS",
-    statIcon: TrendingUp,
-    desc: "Cinematic ad spot with premium feel that elevated brand perception and drove sales.",
-    color: "from-orange-500/25 via-primary/10 to-transparent",
-    videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
-  },
-  {
-    title: "App Launch Promo",
-    category: "Ad Creatives",
-    stat: "50K+ installs",
-    statIcon: TrendingUp,
-    desc: "Snappy mobile-first ad with screen recordings and motion graphics that drove installs.",
-    color: "from-amber-600/25 via-orange-500/10 to-transparent",
-    videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
-  },
-  {
-    title: "Animated Logo Reveal",
-    category: "Motion Graphics",
-    stat: "Premium quality",
-    statIcon: TrendingUp,
-    desc: "Sleek motion design delivering a memorable first impression for a tech startup.",
-    color: "from-primary/30 via-amber-600/10 to-transparent",
-    videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
-  },
-  {
-    title: "Kinetic Typography Intro",
-    category: "Motion Graphics",
-    stat: "Award-winning",
-    statIcon: TrendingUp,
-    desc: "Bold animated text sequences that elevated channel intros to broadcast quality.",
-    color: "from-orange-500/25 via-primary/10 to-transparent",
-    videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
-  },
-  {
-    title: "Data Visualization Anim",
-    category: "Motion Graphics",
-    stat: "+90% clarity",
-    statIcon: BarChart3,
-    desc: "Complex data transformed into engaging animated infographics for investor presentations.",
-    color: "from-amber-500/25 via-orange-600/10 to-transparent",
-    videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
-  },
-  {
-    title: "3D Product Explainer",
-    category: "Motion Graphics",
-    stat: "Studio quality",
-    statIcon: TrendingUp,
-    desc: "Detailed product breakdown with 3D-style motion and smooth transitions.",
-    color: "from-primary/20 via-amber-500/10 to-transparent",
-    videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
-  },
+  // Brand Videos
+  { title: "Video 1", category: "Brand Videos", color: "from-primary/30 via-primary/10 to-transparent", videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4" },
+  { title: "Video 2", category: "Brand Videos", color: "from-orange-600/30 via-primary/10 to-transparent", videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4" },
+  { title: "Video 3", category: "Brand Videos", color: "from-primary/20 via-amber-500/10 to-transparent", videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4" },
+  { title: "Video 4", category: "Brand Videos", color: "from-amber-600/20 via-primary/10 to-transparent", videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4" },
+  // Reels & Shorts
+  { title: "Video 1", category: "Reels & Shorts", color: "from-orange-500/30 via-amber-500/10 to-transparent", videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4" },
+  { title: "Video 2", category: "Reels & Shorts", color: "from-amber-500/30 via-orange-600/10 to-transparent", videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4" },
+  { title: "Video 3", category: "Reels & Shorts", color: "from-primary/25 via-orange-500/10 to-transparent", videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4" },
+  { title: "Video 4", category: "Reels & Shorts", color: "from-orange-600/25 via-amber-500/10 to-transparent", videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4" },
+  // YouTube Videos
+  { title: "Video 1", category: "YouTube Videos", color: "from-primary/30 via-amber-600/10 to-transparent", videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4" },
+  { title: "Video 2", category: "YouTube Videos", color: "from-orange-500/25 via-primary/10 to-transparent", videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4" },
+  { title: "Video 3", category: "YouTube Videos", color: "from-amber-500/25 via-orange-600/10 to-transparent", videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4" },
+  { title: "Video 4", category: "YouTube Videos", color: "from-primary/20 via-amber-500/10 to-transparent", videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4" },
+  // Ads & UGC
+  { title: "Video 1", category: "Ads & UGC", color: "from-amber-500/30 via-orange-500/10 to-transparent", videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4" },
+  { title: "Video 2", category: "Ads & UGC", color: "from-primary/25 via-amber-500/10 to-transparent", videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4" },
+  { title: "Video 3", category: "Ads & UGC", color: "from-orange-500/25 via-primary/10 to-transparent", videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4" },
+  { title: "Video 4", category: "Ads & UGC", color: "from-amber-600/25 via-orange-500/10 to-transparent", videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4" },
 ];
 
-// Get first 6 unique for grid display (one per original slot)
+// One per category for the main grid
 const gridProjects = [
-  projects[0], projects[4], projects[8], projects[12], projects[1], projects[5],
+  projects[0], projects[4], projects[8], projects[12],
 ];
 
-/* ─── Video Card ─── */
+/* ─── Video Card (inside modal) ─── */
 const VideoCard = ({ project, onClick }: { project: Project; onClick: () => void }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -211,13 +84,9 @@ const VideoCard = ({ project, onClick }: { project: Project; onClick: () => void
         </div>
       </div>
       <div className="p-4">
-        <h4 className="font-heading font-semibold text-sm text-foreground mb-1 group-hover:text-primary transition-colors">
+        <h4 className="font-heading font-semibold text-sm text-foreground group-hover:text-primary transition-colors">
           {project.title}
         </h4>
-        <p className="text-muted-foreground text-xs mb-2.5 line-clamp-2">{project.desc}</p>
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-primary/10 border border-primary/20 text-primary text-xs font-medium">
-          <project.statIcon size={12} /> {project.stat}
-        </div>
       </div>
     </motion.div>
   );
@@ -256,12 +125,6 @@ const VideoPlayerModal = ({ project, onClose }: { project: Project; onClose: () 
           autoPlay
           className="w-full h-full object-cover"
         />
-      </div>
-      <div className="mt-3 flex items-center gap-3">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 border border-primary/20 text-primary text-xs font-medium">
-          <project.statIcon size={12} /> {project.stat}
-        </div>
-        <p className="text-muted-foreground text-sm">{project.desc}</p>
       </div>
     </motion.div>
   </motion.div>
@@ -317,9 +180,9 @@ const CategoryModal = ({
           {/* Scrollable grid */}
           <ScrollArea className="flex-1">
             <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {categoryProjects.map((p, i) => (
+              {categoryProjects.map((p) => (
                 <VideoCard
-                  key={p.title}
+                  key={`${p.category}-${p.title}`}
                   project={p}
                   onClick={() => setPlayerProject(p)}
                 />
@@ -393,12 +256,12 @@ const PortfolioSection = () => {
         </motion.div>
 
         {/* Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <AnimatePresence mode="popLayout">
             {filtered.map((p, i) => (
               <motion.div
-                key={p.title}
-                id={`project-${p.title.toLowerCase().replace(/\s+/g, "-")}`}
+                key={`${p.category}-${p.title}`}
+                id={`project-${p.category.toLowerCase().replace(/\s+/g, "-")}`}
                 layout
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -420,13 +283,9 @@ const PortfolioSection = () => {
                 </div>
                 <div className="p-5">
                   <h3 className="font-heading font-semibold text-foreground mb-1.5 group-hover:text-primary transition-colors">
-                    {p.title}
+                    {p.category}
                   </h3>
-                  <p className="text-muted-foreground text-xs mb-3 line-clamp-2">{p.desc}</p>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1.5 text-primary text-sm font-medium">
-                      <p.statIcon size={14} /> {p.stat}
-                    </div>
+                  <div className="flex items-center justify-end">
                     <ExternalLink size={14} className="text-muted-foreground group-hover:text-primary transition-colors" />
                   </div>
                 </div>

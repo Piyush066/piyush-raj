@@ -4,10 +4,8 @@ import { useInView } from "framer-motion";
 import {
   Film,
   Smartphone,
-  Sparkles,
+  Youtube,
   Megaphone,
-  User,
-  TrendingUp,
   ArrowUpRight,
   X,
   CheckCircle2,
@@ -15,6 +13,7 @@ import {
   Target,
   BarChart3,
   Users,
+  TrendingUp,
   PlayCircle,
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -22,19 +21,19 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 const services = [
   {
     icon: Film,
-    title: "YouTube Long-Form Editing",
-    desc: "Engaging edits that maximize watch time and audience retention.",
+    title: "Brand Videos",
+    desc: "Cinematic brand films that tell your story and captivate audiences.",
     num: "01",
     details: {
       summary:
-        "I craft compelling YouTube videos that keep viewers glued from intro to outro. Every cut, transition, and effect is designed to boost watch time and grow your channel.",
+        "I craft compelling brand videos that communicate your vision, build trust, and leave a lasting impression on your audience.",
       features: [
         "Cinematic intros & outros",
-        "Pattern-interrupt cuts to maintain attention",
-        "Custom lower thirds & text animations",
+        "Narrative-driven storytelling",
+        "Custom graphics & text animations",
         "Color grading & audio mixing",
-        "Thumbnail-worthy frame selection",
-        "SEO-optimized chapter markers",
+        "Brand identity integration",
+        "Multi-platform delivery",
       ],
       process: [
         "Receive raw footage & creative brief",
@@ -42,19 +41,19 @@ const services = [
         "First cut with rough edits",
         "Add graphics, music & sound design",
         "Two rounds of revisions",
-        "Final export in platform-optimized formats",
+        "Final export in optimized formats",
       ],
       audience: [
-        "YouTubers scaling past 10K subscribers",
-        "Educators & course creators",
-        "Tech reviewers & product channels",
-        "Vlog & lifestyle creators",
+        "Brands building awareness",
+        "Startups & agencies",
+        "Corporate teams",
+        "Entrepreneurs & founders",
       ],
       results: [
-        "Up to 45% increase in average watch time",
-        "Higher audience retention rates",
-        "More consistent upload schedule",
-        "Professional-grade channel identity",
+        "Elevated brand perception",
+        "Stronger audience connection",
+        "Professional-grade content",
+        "Consistent visual identity",
       ],
       turnaround: "3–5 business days",
       exampleProject: { title: "Brand Story Documentary", id: "project-brand-story-documentary" },
@@ -62,7 +61,7 @@ const services = [
   },
   {
     icon: Smartphone,
-    title: "Reels / Shorts Editing",
+    title: "Reels & Shorts",
     desc: "Scroll-stopping short-form content optimized for virality.",
     num: "02",
     details: {
@@ -91,8 +90,8 @@ const services = [
         "E-commerce & DTC brands",
       ],
       results: [
-        "3–5x increase in reel engagement",
-        "Higher follower growth rate",
+        "Higher engagement rates",
+        "Faster follower growth",
         "Consistent content pipeline",
         "Algorithm-friendly formatting",
       ],
@@ -101,53 +100,53 @@ const services = [
     },
   },
   {
-    icon: Sparkles,
-    title: "Motion Graphics & Transitions",
-    desc: "Dynamic animations that elevate your brand's visual identity.",
+    icon: Youtube,
+    title: "YouTube Videos",
+    desc: "Engaging edits that maximize watch time and audience retention.",
     num: "03",
     details: {
       summary:
-        "From logo reveals to complex infographic animations, I bring your brand to life with smooth, professional motion graphics that set you apart.",
+        "I craft compelling YouTube videos that keep viewers glued from intro to outro. Every cut, transition, and effect is designed to boost watch time and grow your channel.",
       features: [
-        "Logo animations & brand stingers",
-        "Kinetic typography",
-        "Infographic & data visualization",
-        "Custom transition packs",
-        "2D character animation",
-        "Particle & light effects",
+        "Cinematic intros & outros",
+        "Pattern-interrupt cuts to maintain attention",
+        "Custom lower thirds & text animations",
+        "Color grading & audio mixing",
+        "Thumbnail-worthy frame selection",
+        "SEO-optimized chapter markers",
       ],
       process: [
-        "Brand asset & style guide review",
-        "Storyboard & concept sketches",
-        "Initial animation drafts",
-        "Refine timing & easing curves",
-        "Sound design integration",
-        "Export in multiple formats & sizes",
+        "Receive raw footage & creative brief",
+        "Structure narrative arc & pacing",
+        "First cut with rough edits",
+        "Add graphics, music & sound design",
+        "Two rounds of revisions",
+        "Final export in platform-optimized formats",
       ],
       audience: [
-        "Agencies needing branded assets",
-        "SaaS & tech companies",
-        "Creators wanting unique intros",
-        "Event & conference organizers",
+        "YouTubers scaling their channel",
+        "Educators & course creators",
+        "Tech reviewers & product channels",
+        "Vlog & lifestyle creators",
       ],
       results: [
-        "Elevated brand perception",
-        "Reusable animation asset library",
-        "Stand-out visual identity",
-        "Higher production value across content",
+        "Higher average watch time",
+        "Better audience retention",
+        "More consistent uploads",
+        "Professional channel identity",
       ],
-      turnaround: "4–7 business days",
-      exampleProject: { title: "Animated Logo Reveal", id: "project-animated-logo-reveal" },
+      turnaround: "3–5 business days",
+      exampleProject: { title: "Brand Story Documentary", id: "project-brand-story-documentary" },
     },
   },
   {
     icon: Megaphone,
-    title: "Ad Creatives",
-    desc: "High-converting social media ads designed to drive action.",
+    title: "Ads & UGC",
+    desc: "High-converting ad creatives and UGC-style content that drives action.",
     num: "04",
     details: {
       summary:
-        "I design scroll-stopping ad creatives that convert viewers into customers. Every frame is strategically crafted to drive clicks, sign-ups, and sales.",
+        "I design scroll-stopping ad creatives and authentic UGC-style content that converts viewers into customers. Every frame is strategically crafted to drive clicks, sign-ups, and sales.",
       features: [
         "Hook-driven opening frames",
         "A/B test variations included",
@@ -178,86 +177,6 @@ const services = [
       ],
       turnaround: "2–4 business days",
       exampleProject: { title: "E-commerce Ad Campaign", id: "project-e-commerce-ad-campaign" },
-    },
-  },
-  {
-    icon: User,
-    title: "Personal Brand Content",
-    desc: "Consistent, polished content that builds authority and trust.",
-    num: "05",
-    details: {
-      summary:
-        "I help thought leaders, coaches, and creators build a magnetic personal brand through consistently high-quality video content that resonates.",
-      features: [
-        "Talking-head polish & cleanup",
-        "Branded templates & overlays",
-        "Multi-platform repurposing",
-        "Podcast video editing",
-        "Behind-the-scenes content",
-        "Monthly content packages",
-      ],
-      process: [
-        "Brand voice & aesthetic discovery",
-        "Create reusable templates",
-        "Edit weekly content batches",
-        "Repurpose long-form into shorts",
-        "Maintain brand consistency",
-        "Monthly performance review",
-      ],
-      audience: [
-        "Coaches & consultants",
-        "Thought leaders & speakers",
-        "Entrepreneurs building in public",
-        "Podcast hosts & authors",
-      ],
-      results: [
-        "Consistent brand presence across platforms",
-        "More time to focus on business",
-        "Growing authority & trust",
-        "Scalable content system",
-      ],
-      turnaround: "2–3 business days",
-      exampleProject: { title: "Podcast Highlight Clips", id: "project-podcast-highlight-clips" },
-    },
-  },
-  {
-    icon: TrendingUp,
-    title: "Growth-Focused Editing",
-    desc: "Data-driven editing strategies for sustainable channel growth.",
-    num: "06",
-    details: {
-      summary:
-        "I combine creative editing with analytics insights to craft videos optimized for the algorithm. Every decision—from pacing to thumbnails—is backed by data.",
-      features: [
-        "Retention graph analysis",
-        "CTR-optimized thumbnails",
-        "Strategic pacing & hooks",
-        "Competitor content analysis",
-        "A/B intro testing",
-        "Monthly growth reports",
-      ],
-      process: [
-        "Audit current channel analytics",
-        "Identify drop-off patterns",
-        "Restructure video pacing",
-        "Test hook & intro variations",
-        "Implement data-backed changes",
-        "Deliver monthly growth report",
-      ],
-      audience: [
-        "Channels plateauing in growth",
-        "Creators monetizing through YouTube",
-        "Brands with educational content",
-        "Anyone serious about YouTube growth",
-      ],
-      results: [
-        "Sustainable subscriber growth",
-        "Improved video performance metrics",
-        "Clear content strategy roadmap",
-        "Higher RPM & ad revenue",
-      ],
-      turnaround: "3–5 business days",
-      exampleProject: { title: "Instagram Growth Series", id: "project-instagram-growth-series" },
     },
   },
 ];
@@ -349,14 +268,8 @@ const ServiceModal = ({
             <SectionCard icon={CheckCircle2} title="What You Get">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {service.details.features.map((f) => (
-                  <div
-                    key={f}
-                    className="flex items-start gap-2 text-sm text-muted-foreground"
-                  >
-                    <CheckCircle2
-                      size={14}
-                      className="text-primary mt-0.5 shrink-0"
-                    />
+                  <div key={f} className="flex items-start gap-2 text-sm text-muted-foreground">
+                    <CheckCircle2 size={14} className="text-primary mt-0.5 shrink-0" />
                     {f}
                   </div>
                 ))}
@@ -367,10 +280,7 @@ const ServiceModal = ({
             <SectionCard icon={ListChecks} title="My Process">
               <ol className="space-y-2">
                 {service.details.process.map((step, i) => (
-                  <li
-                    key={step}
-                    className="flex items-start gap-3 text-sm text-muted-foreground"
-                  >
+                  <li key={step} className="flex items-start gap-3 text-sm text-muted-foreground">
                     <span className="w-5 h-5 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-[10px] font-bold text-primary shrink-0 mt-0.5">
                       {i + 1}
                     </span>
@@ -384,10 +294,7 @@ const ServiceModal = ({
             <SectionCard icon={Users} title="Who This Is For">
               <div className="flex flex-wrap gap-2">
                 {service.details.audience.map((a) => (
-                  <span
-                    key={a}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/5 border border-primary/10 text-xs text-muted-foreground"
-                  >
+                  <span key={a} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/5 border border-primary/10 text-xs text-muted-foreground">
                     <Target size={10} className="text-primary" />
                     {a}
                   </span>
@@ -399,14 +306,8 @@ const ServiceModal = ({
             <SectionCard icon={BarChart3} title="Expected Results">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {service.details.results.map((r) => (
-                  <div
-                    key={r}
-                    className="flex items-start gap-2 text-sm text-muted-foreground"
-                  >
-                    <TrendingUp
-                      size={14}
-                      className="text-primary mt-0.5 shrink-0"
-                    />
+                  <div key={r} className="flex items-start gap-2 text-sm text-muted-foreground">
+                    <TrendingUp size={14} className="text-primary mt-0.5 shrink-0" />
                     {r}
                   </div>
                 ))}
@@ -502,7 +403,7 @@ const ServicesSection = () => {
             </p>
           </motion.div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {services.map((s, i) => (
               <motion.div
                 key={s.title}
