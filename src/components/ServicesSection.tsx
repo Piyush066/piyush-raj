@@ -214,6 +214,13 @@ const ServiceModal = ({
 }) => {
   const Icon = service.icon;
 
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, []);
+
   return (
     <motion.div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
@@ -226,14 +233,15 @@ const ServiceModal = ({
       <div className="absolute inset-0 bg-background/80 backdrop-blur-md" />
 
       <motion.div
-        className="relative z-10 w-full max-w-2xl glass-card rounded-2xl border border-border overflow-hidden max-h-[90vh] flex flex-col"
+        className="relative z-10 w-full max-w-2xl glass-card rounded-2xl border border-border overflow-hidden"
+        style={{ maxHeight: "90vh" }}
         initial={{ scale: 0.9, opacity: 0, y: 20 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.9, opacity: 0, y: 20 }}
         transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-accent" />
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-accent z-20" />
 
         <button
           onClick={onClose}
@@ -242,7 +250,7 @@ const ServiceModal = ({
           <X size={16} />
         </button>
 
-        <ScrollArea className="flex-1 max-h-[90vh]">
+        <div className="overflow-y-auto" style={{ maxHeight: "90vh" }}>
           <div className="p-7 space-y-5">
             {/* 1. Title */}
             <div className="flex items-center gap-4 pr-8">
