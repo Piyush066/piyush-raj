@@ -183,63 +183,82 @@ const ContactSection = () => {
             className="glass-card rounded-2xl p-8 space-y-4 border border-border"
           >
             <div className="grid sm:grid-cols-2 gap-4">
-              <input
-                type="text"
-                placeholder="Your Name"
-                required
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                className={inputClass}
-              />
-              <input
-                type="email"
-                placeholder="Your Email"
-                required
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-                className={inputClass}
-              />
+              <div>
+                <input
+                  type="text"
+                  placeholder="Your Name"
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  onBlur={() => handleBlur("name")}
+                  className={`${inputBase} ${borderClass("name")}`}
+                />
+                {fieldError("name")}
+              </div>
+              <div>
+                <input
+                  type="email"
+                  placeholder="Your Email"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  onBlur={() => handleBlur("email")}
+                  className={`${inputBase} ${borderClass("email")}`}
+                />
+                {fieldError("email")}
+              </div>
             </div>
             <div className="grid sm:grid-cols-2 gap-4">
-              <select
-                value={form.type}
-                onChange={(e) => setForm({ ...form, type: e.target.value })}
-                className={inputClass}
-              >
-                <option value="">Project Type</option>
-                <option value="youtube">YouTube Editing</option>
-                <option value="reels">Reels / Shorts</option>
-                <option value="ads">Ad Creatives</option>
-                <option value="motion">Motion Graphics</option>
-                <option value="other">Other</option>
-              </select>
-              <select
-                value={form.budget}
-                onChange={(e) => setForm({ ...form, budget: e.target.value })}
-                className={inputClass}
-              >
-                <option value="">Budget Range</option>
-                <option value="₹600 – ₹1,000">₹600 – ₹1,000</option>
-                <option value="₹1,000 – ₹2,500">₹1,000 – ₹2,500</option>
-                <option value="₹2,500 – ₹5,000">₹2,500 – ₹5,000</option>
-                <option value="₹5,000 – ₹10,000">₹5,000 – ₹10,000</option>
-              </select>
+              <div>
+                <select
+                  value={form.type}
+                  onChange={(e) => setForm({ ...form, type: e.target.value })}
+                  onBlur={() => handleBlur("type")}
+                  className={`${inputBase} ${borderClass("type")}`}
+                >
+                  <option value="">Project Type</option>
+                  <option value="youtube">YouTube Editing</option>
+                  <option value="reels">Reels / Shorts</option>
+                  <option value="ads">Ad Creatives</option>
+                  <option value="motion">Motion Graphics</option>
+                  <option value="other">Other</option>
+                </select>
+                {fieldError("type")}
+              </div>
+              <div>
+                <select
+                  value={form.budget}
+                  onChange={(e) => setForm({ ...form, budget: e.target.value })}
+                  onBlur={() => handleBlur("budget")}
+                  className={`${inputBase} ${borderClass("budget")}`}
+                >
+                  <option value="">Budget Range</option>
+                  <option value="₹600 – ₹1,000">₹600 – ₹1,000</option>
+                  <option value="₹1,000 – ₹2,500">₹1,000 – ₹2,500</option>
+                  <option value="₹2,500 – ₹5,000">₹2,500 – ₹5,000</option>
+                  <option value="₹5,000 – ₹10,000">₹5,000 – ₹10,000</option>
+                </select>
+                {fieldError("budget")}
+              </div>
             </div>
-            <textarea
-              placeholder="Tell me about your project..."
-              rows={5}
-              required
-              value={form.message}
-              onChange={(e) => setForm({ ...form, message: e.target.value })}
-              className={`${inputClass} resize-none`}
-            />
+            <div>
+              <textarea
+                placeholder="Tell me about your project..."
+                rows={5}
+                value={form.message}
+                onChange={(e) => setForm({ ...form, message: e.target.value })}
+                onBlur={() => handleBlur("message")}
+                className={`${inputBase} ${borderClass("message")} resize-none`}
+              />
+              {fieldError("message")}
+            </div>
             <button
               type="submit"
-              disabled={submitted || loading}
+              disabled={submitted || loading || !isFormValid}
               className={`w-full py-4 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all duration-300 text-sm ${
                 submitted
                   ? "bg-green-500/20 text-green-400 border border-green-500/30"
-                  : "bg-primary text-primary-foreground hover:shadow-[0_0_30px_hsl(24_95%_53%_/_0.4)]"
+                  : !isFormValid
+                    ? "bg-primary/50 text-primary-foreground/50 cursor-not-allowed"
+                    : "bg-primary text-primary-foreground hover:shadow-[0_0_30px_hsl(24_95%_53%_/_0.4)]"
               }`}
             >
               {submitted ? (
