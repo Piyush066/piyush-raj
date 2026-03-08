@@ -1,6 +1,6 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
-import { Lightbulb, Brain, TrendingUp, Sparkles, ArrowRight } from "lucide-react";
+import { Lightbulb, Brain, TrendingUp, Sparkles } from "lucide-react";
 
 const specializations = [
   { icon: Lightbulb, label: "Retention-focused editing", desc: "Maximize viewer watch time" },
