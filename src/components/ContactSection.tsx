@@ -9,8 +9,14 @@ import {
   Send,
   ArrowUpRight,
   CheckCircle2,
+  Loader2,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import emailjs from "@emailjs/browser";
+
+const EMAILJS_SERVICE_ID = "service_6chwvup";
+const EMAILJS_TEMPLATE_ID = "template_ryus6fe";
+const EMAILJS_PUBLIC_KEY = "IhpAE6nokuTqdwsfF";
 
 const contactInfo = [
   { icon: Mail, label: "rajpiyush9572@gmail.com", href: "mailto:rajpiyush9572@gmail.com", color: "from-primary/20 to-orange-600/5" },
@@ -26,15 +32,42 @@ const ContactSection = () => {
   const { toast } = useToast();
   const [form, setForm] = useState({ name: "", email: "", type: "", budget: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    toast({ title: "Message sent! ✨", description: "Thanks for reaching out. I'll get back to you soon." });
-    setTimeout(() => {
+    setLoading(true);
+
+    try {
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        {
+          from_name: form.name,
+          from_email: form.email,
+          project_type: form.type,
+          budget: form.budget,
+          message: form.message,
+        },
+        EMAILJS_PUBLIC_KEY
+      );
+
+      setSubmitted(true);
+      toast({
+        title: "Message Sent! ✨",
+        description: "Your message has been sent successfully. I will get back to you within 24 hours.",
+      });
       setForm({ name: "", email: "", type: "", budget: "", message: "" });
-      setSubmitted(false);
-    }, 3000);
+      setTimeout(() => setSubmitted(false), 4000);
+    } catch (error) {
+      toast({
+        title: "Failed to send",
+        description: "Something went wrong. Please try again or email directly.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const inputClass =
