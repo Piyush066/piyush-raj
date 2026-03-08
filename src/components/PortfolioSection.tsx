@@ -214,6 +214,17 @@ const PortfolioSection = () => {
   const [filter, setFilter] = useState("All");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const category = (e as CustomEvent).detail?.category;
+      if (category && categories.includes(category)) {
+        setFilter(category);
+      }
+    };
+    window.addEventListener("navigate-portfolio", handler);
+    return () => window.removeEventListener("navigate-portfolio", handler);
+  }, []);
+
   const filtered = filter === "All" ? gridProjects : gridProjects.filter((p) => p.category === filter);
 
   return (
