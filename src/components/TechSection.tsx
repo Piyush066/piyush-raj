@@ -28,7 +28,7 @@ const techGroups = [
     accent: "from-orange-600/20 to-amber-600/5",
   },
   {
-    icon: Wrench,
+    icon: Palette,
     title: "Creative Tools",
     items: ["Adobe Premiere Pro", "After Effects", "CapCut (PC)", "Photoshop", "Canva"],
     accent: "from-primary/20 to-orange-500/5",
