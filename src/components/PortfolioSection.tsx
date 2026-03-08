@@ -161,7 +161,7 @@ const CategoryModal = ({
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.9, opacity: 0, y: 20 }}
           transition={{ duration: 0.25, ease: "easeOut" }}
-          className="glass-card rounded-2xl max-w-3xl w-full border border-border max-h-[90vh] flex flex-col"
+          className="glass-card rounded-2xl max-w-3xl w-full border border-border max-h-[90vh] flex flex-col overflow-hidden"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
@@ -183,7 +183,7 @@ const CategoryModal = ({
           </div>
 
           {/* Scrollable grid */}
-          <ScrollArea className="flex-1">
+          <div className="flex-1 overflow-y-auto overscroll-contain">
             <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
               {categoryProjects.map((p) => (
                 <VideoCard
@@ -193,7 +193,7 @@ const CategoryModal = ({
                 />
               ))}
             </div>
-          </ScrollArea>
+          </div>
         </motion.div>
       </motion.div>
 
