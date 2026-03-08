@@ -43,8 +43,8 @@ const ContactSection = () => {
         EMAILJS_SERVICE_ID,
         EMAILJS_TEMPLATE_ID,
         {
-          from_name: form.name,
-          from_email: form.email,
+          name: form.name,
+          email: form.email,
           project_type: form.type,
           budget: form.budget,
           message: form.message,
