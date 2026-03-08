@@ -1,6 +1,6 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
-import { Code2, BrainCircuit, Globe, Wrench } from "lucide-react";
+import { Code2, BrainCircuit, Globe, Wrench, Palette } from "lucide-react";
 
 const techGroups = [
   {
