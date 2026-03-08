@@ -88,8 +88,14 @@ const ContactSection = () => {
     }
   };
 
-  const inputClass =
-    "w-full px-4 py-3.5 rounded-xl bg-secondary/50 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:bg-secondary/80 transition-all duration-300 text-sm";
+  const inputBase =
+    "w-full px-4 py-3.5 rounded-xl bg-secondary/50 border text-foreground placeholder:text-muted-foreground focus:outline-none focus:bg-secondary/80 transition-all duration-300 text-sm";
+  const borderClass = (field: string) =>
+    touched[field] && errors[field] ? "border-destructive" : "border-border focus:border-primary";
+  const fieldError = (field: string) =>
+    touched[field] && errors[field] ? (
+      <p className="text-destructive text-xs mt-1">{errors[field]}</p>
+    ) : null;
 
   return (
     <section id="contact" className="section-padding relative overflow-hidden" ref={ref}>
