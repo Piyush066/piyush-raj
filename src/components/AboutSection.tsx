@@ -76,16 +76,15 @@ const AboutSection = () => {
                   transition={{ duration: 0.4, delay: 0.3 + i * 0.1 }}
                   className="glass-card rounded-xl p-5 border border-border group hover-lift cursor-default"
                 >
-                  <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
-                      <s.icon size={18} className="text-primary" />
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="text-foreground font-semibold text-sm mb-0.5">{s.label}</h4>
-                      <p className="text-muted-foreground text-xs">{s.desc}</p>
-                    </div>
-                    <ArrowRight size={14} className="text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all mt-1 shrink-0" />
-                  </div>
+                    <div className="flex items-start gap-4">
+                     <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
+                       <s.icon size={18} className="text-primary" />
+                     </div>
+                     <div className="flex-1">
+                       <h4 className="text-foreground font-semibold text-sm mb-0.5">{s.label}</h4>
+                       <p className="text-muted-foreground text-xs">{s.desc}</p>
+                     </div>
+                   </div>
                 </motion.div>
               ))}
             </motion.div>
