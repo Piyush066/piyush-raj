@@ -341,12 +341,11 @@ const ServiceModal = ({
                 onClick={() => {
                   onClose();
                   setTimeout(() => {
-                    const el = document.getElementById(service.details.exampleProject.id);
-                    if (el) {
-                      el.scrollIntoView({ behavior: "smooth", block: "center" });
-                      el.classList.add("ring-2", "ring-primary", "ring-offset-2", "ring-offset-background");
-                      setTimeout(() => el.classList.remove("ring-2", "ring-primary", "ring-offset-2", "ring-offset-background"), 2000);
-                    }
+                    window.dispatchEvent(
+                      new CustomEvent("navigate-portfolio", { detail: { category: service.title } })
+                    );
+                    const section = document.getElementById("portfolio");
+                    if (section) section.scrollIntoView({ behavior: "smooth", block: "start" });
                   }, 350);
                 }}
                 className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-secondary border border-border text-xs font-semibold text-foreground hover:border-primary/40 hover:text-primary transition-all shrink-0"
