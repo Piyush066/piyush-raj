@@ -195,10 +195,10 @@ const ContactSection = () => {
                 className={inputClass}
               >
                 <option value="">Budget Range</option>
-                <option value="500">Under $500</option>
-                <option value="1000">$500 – $1,000</option>
-                <option value="2500">$1,000 – $2,500</option>
-                <option value="5000">$2,500+</option>
+                <option value="₹600 – ₹1,000">₹600 – ₹1,000</option>
+                <option value="₹1,000 – ₹2,500">₹1,000 – ₹2,500</option>
+                <option value="₹2,500 – ₹5,000">₹2,500 – ₹5,000</option>
+                <option value="₹5,000 – ₹10,000">₹5,000 – ₹10,000</option>
               </select>
             </div>
             <textarea
