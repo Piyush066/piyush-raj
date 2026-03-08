@@ -307,14 +307,15 @@ const PortfolioSection = () => {
           </AnimatePresence>
         </div>
 
-        <AnimatePresence>
-          {selectedCategory && (
+        {selectedCategory && createPortal(
+          <AnimatePresence>
             <CategoryModal
               category={selectedCategory}
               onClose={() => setSelectedCategory(null)}
             />
-          )}
-        </AnimatePresence>
+          </AnimatePresence>,
+          document.body
+        )}
       </div>
     </section>
   );
