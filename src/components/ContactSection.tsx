@@ -26,6 +26,8 @@ const contactInfo = [
   { icon: MapPin, label: "Koderma, Jharkhand, India", href: "#", color: "from-amber-500/20 to-orange-500/5" },
 ];
 
+const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
 const ContactSection = () => {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-100px" });
@@ -33,9 +35,24 @@ const ContactSection = () => {
   const [form, setForm] = useState({ name: "", email: "", type: "", budget: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+  const errors: Record<string, string> = {};
+  if (!form.name.trim()) errors.name = "This field is required.";
+  if (!form.email.trim()) errors.email = "This field is required.";
+  else if (!isValidEmail(form.email)) errors.email = "Please enter a valid email.";
+  if (!form.type) errors.type = "This field is required.";
+  if (!form.budget) errors.budget = "This field is required.";
+  if (!form.message.trim()) errors.message = "This field is required.";
+
+  const isFormValid = Object.keys(errors).length === 0;
+
+  const handleBlur = (field: string) => setTouched((t) => ({ ...t, [field]: true }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setTouched({ name: true, email: true, type: true, budget: true, message: true });
+    if (!isFormValid) return;
     setLoading(true);
 
     try {
@@ -58,6 +75,7 @@ const ContactSection = () => {
         description: "Your message has been sent successfully. I will get back to you within 24 hours.",
       });
       setForm({ name: "", email: "", type: "", budget: "", message: "" });
+      setTouched({});
       setTimeout(() => setSubmitted(false), 4000);
     } catch (error) {
       toast({
@@ -70,8 +88,14 @@ const ContactSection = () => {
     }
   };
 
-  const inputClass =
-    "w-full px-4 py-3.5 rounded-xl bg-secondary/50 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:bg-secondary/80 transition-all duration-300 text-sm";
+  const inputBase =
+    "w-full px-4 py-3.5 rounded-xl bg-secondary/50 border text-foreground placeholder:text-muted-foreground focus:outline-none focus:bg-secondary/80 transition-all duration-300 text-sm";
+  const borderClass = (field: string) =>
+    touched[field] && errors[field] ? "border-destructive" : "border-border focus:border-primary";
+  const fieldError = (field: string) =>
+    touched[field] && errors[field] ? (
+      <p className="text-destructive text-xs mt-1">{errors[field]}</p>
+    ) : null;
 
   return (
     <section id="contact" className="section-padding relative overflow-hidden" ref={ref}>
@@ -159,63 +183,82 @@ const ContactSection = () => {
             className="glass-card rounded-2xl p-8 space-y-4 border border-border"
           >
             <div className="grid sm:grid-cols-2 gap-4">
-              <input
-                type="text"
-                placeholder="Your Name"
-                required
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                className={inputClass}
-              />
-              <input
-                type="email"
-                placeholder="Your Email"
-                required
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-                className={inputClass}
-              />
+              <div>
+                <input
+                  type="text"
+                  placeholder="Your Name"
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  onBlur={() => handleBlur("name")}
+                  className={`${inputBase} ${borderClass("name")}`}
+                />
+                {fieldError("name")}
+              </div>
+              <div>
+                <input
+                  type="email"
+                  placeholder="Your Email"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  onBlur={() => handleBlur("email")}
+                  className={`${inputBase} ${borderClass("email")}`}
+                />
+                {fieldError("email")}
+              </div>
             </div>
             <div className="grid sm:grid-cols-2 gap-4">
-              <select
-                value={form.type}
-                onChange={(e) => setForm({ ...form, type: e.target.value })}
-                className={inputClass}
-              >
-                <option value="">Project Type</option>
-                <option value="youtube">YouTube Editing</option>
-                <option value="reels">Reels / Shorts</option>
-                <option value="ads">Ad Creatives</option>
-                <option value="motion">Motion Graphics</option>
-                <option value="other">Other</option>
-              </select>
-              <select
-                value={form.budget}
-                onChange={(e) => setForm({ ...form, budget: e.target.value })}
-                className={inputClass}
-              >
-                <option value="">Budget Range</option>
-                <option value="₹600 – ₹1,000">₹600 – ₹1,000</option>
-                <option value="₹1,000 – ₹2,500">₹1,000 – ₹2,500</option>
-                <option value="₹2,500 – ₹5,000">₹2,500 – ₹5,000</option>
-                <option value="₹5,000 – ₹10,000">₹5,000 – ₹10,000</option>
-              </select>
+              <div>
+                <select
+                  value={form.type}
+                  onChange={(e) => setForm({ ...form, type: e.target.value })}
+                  onBlur={() => handleBlur("type")}
+                  className={`${inputBase} ${borderClass("type")}`}
+                >
+                  <option value="">Project Type</option>
+                  <option value="youtube">YouTube Editing</option>
+                  <option value="reels">Reels / Shorts</option>
+                  <option value="ads">Ad Creatives</option>
+                  <option value="motion">Motion Graphics</option>
+                  <option value="other">Other</option>
+                </select>
+                {fieldError("type")}
+              </div>
+              <div>
+                <select
+                  value={form.budget}
+                  onChange={(e) => setForm({ ...form, budget: e.target.value })}
+                  onBlur={() => handleBlur("budget")}
+                  className={`${inputBase} ${borderClass("budget")}`}
+                >
+                  <option value="">Budget Range</option>
+                  <option value="₹600 – ₹1,000">₹600 – ₹1,000</option>
+                  <option value="₹1,000 – ₹2,500">₹1,000 – ₹2,500</option>
+                  <option value="₹2,500 – ₹5,000">₹2,500 – ₹5,000</option>
+                  <option value="₹5,000 – ₹10,000">₹5,000 – ₹10,000</option>
+                </select>
+                {fieldError("budget")}
+              </div>
             </div>
-            <textarea
-              placeholder="Tell me about your project..."
-              rows={5}
-              required
-              value={form.message}
-              onChange={(e) => setForm({ ...form, message: e.target.value })}
-              className={`${inputClass} resize-none`}
-            />
+            <div>
+              <textarea
+                placeholder="Tell me about your project..."
+                rows={5}
+                value={form.message}
+                onChange={(e) => setForm({ ...form, message: e.target.value })}
+                onBlur={() => handleBlur("message")}
+                className={`${inputBase} ${borderClass("message")} resize-none`}
+              />
+              {fieldError("message")}
+            </div>
             <button
               type="submit"
-              disabled={submitted || loading}
+              disabled={submitted || loading || !isFormValid}
               className={`w-full py-4 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all duration-300 text-sm ${
                 submitted
                   ? "bg-green-500/20 text-green-400 border border-green-500/30"
-                  : "bg-primary text-primary-foreground hover:shadow-[0_0_30px_hsl(24_95%_53%_/_0.4)]"
+                  : !isFormValid
+                    ? "bg-primary/50 text-primary-foreground/50 cursor-not-allowed"
+                    : "bg-primary text-primary-foreground hover:shadow-[0_0_30px_hsl(24_95%_53%_/_0.4)]"
               }`}
             >
               {submitted ? (
