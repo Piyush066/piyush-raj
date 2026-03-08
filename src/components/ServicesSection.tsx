@@ -250,7 +250,7 @@ const ServiceModal = ({
           <X size={16} />
         </button>
 
-        <div className="overflow-y-auto" style={{ maxHeight: "90vh" }}>
+        <div className="overflow-y-auto modal-scroll" style={{ maxHeight: "90vh" }}>
           <div className="p-7 space-y-5">
             {/* 1. Title */}
             <div className="flex items-center gap-4 pr-8">
