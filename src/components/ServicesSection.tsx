@@ -372,7 +372,7 @@ const ServiceModal = ({
               </a>
             </div>
           </div>
-        </ScrollArea>
+        </div>
       </motion.div>
     </motion.div>
   );
