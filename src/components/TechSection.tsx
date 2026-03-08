@@ -24,7 +24,7 @@ const techGroups = [
   {
     icon: Wrench,
     title: "Tools",
-    items: ["Git", "GitHub", "VS Code", "Jupyter", "AWS (Basics)"],
+    items: ["Git", "GitHub", "VS Code", "Jupyter", "AWS (Basics)", "Adobe Premiere Pro", "After Effects", "CapCut (PC)", "Photoshop", "Canva"],
     accent: "from-orange-600/20 to-amber-600/5",
   },
 ];
