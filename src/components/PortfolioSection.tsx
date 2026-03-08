@@ -184,7 +184,7 @@ const CategoryModal = ({
           </div>
 
           {/* Scrollable grid */}
-          <div className="flex-1 overflow-y-auto overscroll-contain">
+          <div className="flex-1 overflow-y-auto overscroll-contain modal-scroll">
             <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
               {categoryProjects.map((p) => (
                 <VideoCard
