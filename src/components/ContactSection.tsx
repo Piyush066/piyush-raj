@@ -211,7 +211,7 @@ const ContactSection = () => {
             />
             <button
               type="submit"
-              disabled={submitted}
+              disabled={submitted || loading}
               className={`w-full py-4 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all duration-300 text-sm ${
                 submitted
                   ? "bg-green-500/20 text-green-400 border border-green-500/30"
@@ -221,6 +221,10 @@ const ContactSection = () => {
               {submitted ? (
                 <>
                   <CheckCircle2 size={16} /> Message Sent!
+                </>
+              ) : loading ? (
+                <>
+                  <Loader2 size={16} className="animate-spin" /> Sending...
                 </>
               ) : (
                 <>
