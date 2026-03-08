@@ -26,6 +26,8 @@ const contactInfo = [
   { icon: MapPin, label: "Koderma, Jharkhand, India", href: "#", color: "from-amber-500/20 to-orange-500/5" },
 ];
 
+const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
 const ContactSection = () => {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-100px" });
@@ -33,9 +35,24 @@ const ContactSection = () => {
   const [form, setForm] = useState({ name: "", email: "", type: "", budget: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+  const errors: Record<string, string> = {};
+  if (!form.name.trim()) errors.name = "This field is required.";
+  if (!form.email.trim()) errors.email = "This field is required.";
+  else if (!isValidEmail(form.email)) errors.email = "Please enter a valid email.";
+  if (!form.type) errors.type = "This field is required.";
+  if (!form.budget) errors.budget = "This field is required.";
+  if (!form.message.trim()) errors.message = "This field is required.";
+
+  const isFormValid = Object.keys(errors).length === 0;
+
+  const handleBlur = (field: string) => setTouched((t) => ({ ...t, [field]: true }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setTouched({ name: true, email: true, type: true, budget: true, message: true });
+    if (!isFormValid) return;
     setLoading(true);
 
     try {
@@ -58,6 +75,7 @@ const ContactSection = () => {
         description: "Your message has been sent successfully. I will get back to you within 24 hours.",
       });
       setForm({ name: "", email: "", type: "", budget: "", message: "" });
+      setTouched({});
       setTimeout(() => setSubmitted(false), 4000);
     } catch (error) {
       toast({
