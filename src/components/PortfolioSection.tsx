@@ -1,5 +1,6 @@
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Play, X, ExternalLink } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -306,14 +307,15 @@ const PortfolioSection = () => {
           </AnimatePresence>
         </div>
 
-        <AnimatePresence>
-          {selectedCategory && (
+        {selectedCategory && createPortal(
+          <AnimatePresence>
             <CategoryModal
               category={selectedCategory}
               onClose={() => setSelectedCategory(null)}
             />
-          )}
-        </AnimatePresence>
+          </AnimatePresence>,
+          document.body
+        )}
       </div>
     </section>
   );
