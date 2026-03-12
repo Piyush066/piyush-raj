@@ -41,19 +41,16 @@ const Navbar = () => {
 
   const toggleVapi = async () => {
     if (vapiActive) {
-      vapiRef.current?.stop?.();
+      vapiRef.current?.stop();
       setVapiActive(false);
       return;
     }
 
     setVapiLoading(true);
     try {
-      const VapiSDK = (window as any).Vapi;
-      if (!VapiSDK) throw new Error("SDK not loaded");
-
       if (!vapiRef.current) {
-        vapiRef.current = new VapiSDK(VAPI_PUBLIC_KEY);
-        vapiRef.current.on?.("call-end", () => setVapiActive(false));
+        vapiRef.current = new Vapi(VAPI_PUBLIC_KEY);
+        vapiRef.current.on("call-end", () => setVapiActive(false));
       }
 
       await vapiRef.current.start(ASSISTANT_ID);
