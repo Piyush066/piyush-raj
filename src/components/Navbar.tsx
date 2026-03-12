@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { Menu, X, Mic, MicOff } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import Vapi from "@vapi-ai/web";
 
-const VAPI_CDN = "https://cdn.jsdelivr.net/npm/@vapi-ai/web/dist/index.min.js";
 const VAPI_PUBLIC_KEY = "0d456a9a-6dc8-4a8f-9abc-d281b1374496";
 const ASSISTANT_ID = "d5db0294-6ae8-45ae-b376-b024c6588945";
 
@@ -21,12 +21,11 @@ const Navbar = () => {
   const [active, setActive] = useState("#home");
   const [vapiActive, setVapiActive] = useState(false);
   const [vapiLoading, setVapiLoading] = useState(false);
-  const vapiRef = useRef<any>(null);
+  const vapiRef = useRef<Vapi | null>(null);
 
   useEffect(() => {
     const onScroll = () => {
       setScrolled(window.scrollY > 50);
-      // Update active section
       const sections = navLinks.map((l) => l.href.slice(1));
       for (const id of [...sections].reverse()) {
         const el = document.getElementById(id);
@@ -38,15 +37,6 @@ const Navbar = () => {
     };
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  // Load Vapi SDK once
-  useEffect(() => {
-    if (document.querySelector(`script[src="${VAPI_CDN}"]`)) return;
-    const script = document.createElement("script");
-    script.src = VAPI_CDN;
-    script.async = true;
-    document.head.appendChild(script);
   }, []);
 
   const toggleVapi = async () => {
