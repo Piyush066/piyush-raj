@@ -165,6 +165,21 @@ const Navbar = () => {
                 {l.label}
               </a>
             ))}
+            <button
+              onClick={() => {
+                setOpen(false);
+                toggleVapi();
+              }}
+              disabled={vapiLoading}
+              className={`mt-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-center flex items-center justify-center gap-2 transition-all ${
+                vapiActive
+                  ? "bg-primary text-primary-foreground"
+                  : "border border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground"
+              }`}
+            >
+              {vapiActive ? <MicOff size={16} /> : <Mic size={16} />}
+              <span>{vapiLoading ? "Connecting…" : vapiActive ? "End Call" : "Talk to Assistant"}</span>
+            </button>
             <a
               href="#contact"
               onClick={() => setOpen(false)}
