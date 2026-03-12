@@ -112,9 +112,24 @@ const Navbar = () => {
               )}
             </a>
           ))}
+          <button
+            onClick={toggleVapi}
+            disabled={vapiLoading}
+            className={`relative ml-2 px-5 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
+              vapiActive
+                ? "bg-primary text-primary-foreground shadow-[0_0_20px_hsl(24_95%_53%_/_0.4)]"
+                : "border border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground"
+            }`}
+          >
+            {vapiActive ? <MicOff size={16} /> : <Mic size={16} />}
+            <span>{vapiLoading ? "Connecting…" : vapiActive ? "End Call" : "Talk to Assistant"}</span>
+            {vapiActive && (
+              <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-primary animate-ping" />
+            )}
+          </button>
           <a
             href="#contact"
-            className="ml-4 px-5 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:shadow-[0_0_20px_hsl(24_95%_53%_/_0.4)] transition-all duration-300"
+            className="ml-2 px-5 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:shadow-[0_0_20px_hsl(24_95%_53%_/_0.4)] transition-all duration-300"
           >
             Hire Me
           </a>
