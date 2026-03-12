@@ -18,6 +18,9 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState("#home");
+  const [vapiActive, setVapiActive] = useState(false);
+  const [vapiLoading, setVapiLoading] = useState(false);
+  const vapiRef = useRef<any>(null);
 
   useEffect(() => {
     const onScroll = () => {
