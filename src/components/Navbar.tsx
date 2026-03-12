@@ -39,6 +39,41 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Load Vapi SDK once
+  useEffect(() => {
+    if (document.querySelector(`script[src="${VAPI_CDN}"]`)) return;
+    const script = document.createElement("script");
+    script.src = VAPI_CDN;
+    script.async = true;
+    document.head.appendChild(script);
+  }, []);
+
+  const toggleVapi = async () => {
+    if (vapiActive) {
+      vapiRef.current?.stop?.();
+      setVapiActive(false);
+      return;
+    }
+
+    setVapiLoading(true);
+    try {
+      const Vapi = (window as any).Vapi;
+      if (!Vapi) throw new Error("SDK not loaded");
+
+      if (!vapiRef.current) {
+        vapiRef.current = new Vapi(ASSISTANT_ID);
+        vapiRef.current.on?.("call-end", () => setVapiActive(false));
+      }
+
+      await vapiRef.current.start?.(ASSISTANT_ID);
+      setVapiActive(true);
+    } catch (e) {
+      console.error("Vapi error:", e);
+    } finally {
+      setVapiLoading(false);
+    }
+  };
+
   return (
     <motion.nav
       initial={{ y: -100 }}
