@@ -1,6 +1,9 @@
-import { useState, useEffect } from "react";
-import { Menu, X } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Menu, X, Mic, MicOff } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+
+const VAPI_CDN = "https://cdn.jsdelivr.net/npm/@vapi-ai/web/dist/index.min.js";
+const ASSISTANT_ID = "d5db0294-6ae8-45ae-b376-b024c6588945";
 
 const navLinks = [
   { href: "#home", label: "Home" },
