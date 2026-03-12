@@ -3,6 +3,7 @@ import { Menu, X, Mic, MicOff } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const VAPI_CDN = "https://cdn.jsdelivr.net/npm/@vapi-ai/web/dist/index.min.js";
+const VAPI_PUBLIC_KEY = "0d456a9a-6dc8-4a8f-9abc-d281b1374496";
 const ASSISTANT_ID = "d5db0294-6ae8-45ae-b376-b024c6588945";
 
 const navLinks = [
@@ -57,15 +58,15 @@ const Navbar = () => {
 
     setVapiLoading(true);
     try {
-      const Vapi = (window as any).Vapi;
-      if (!Vapi) throw new Error("SDK not loaded");
+      const VapiSDK = (window as any).Vapi;
+      if (!VapiSDK) throw new Error("SDK not loaded");
 
       if (!vapiRef.current) {
-        vapiRef.current = new Vapi(ASSISTANT_ID);
+        vapiRef.current = new VapiSDK(VAPI_PUBLIC_KEY);
         vapiRef.current.on?.("call-end", () => setVapiActive(false));
       }
 
-      await vapiRef.current.start?.(ASSISTANT_ID);
+      await vapiRef.current.start(ASSISTANT_ID);
       setVapiActive(true);
     } catch (e) {
       console.error("Vapi error:", e);
