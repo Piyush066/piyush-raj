@@ -58,15 +58,15 @@ const Navbar = () => {
 
     setVapiLoading(true);
     try {
-      const Vapi = (window as any).Vapi;
-      if (!Vapi) throw new Error("SDK not loaded");
+      const VapiSDK = (window as any).Vapi;
+      if (!VapiSDK) throw new Error("SDK not loaded");
 
       if (!vapiRef.current) {
-        vapiRef.current = new Vapi(ASSISTANT_ID);
+        vapiRef.current = new VapiSDK(VAPI_PUBLIC_KEY);
         vapiRef.current.on?.("call-end", () => setVapiActive(false));
       }
 
-      await vapiRef.current.start?.(ASSISTANT_ID);
+      await vapiRef.current.start(ASSISTANT_ID);
       setVapiActive(true);
     } catch (e) {
       console.error("Vapi error:", e);
