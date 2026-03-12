@@ -20,7 +20,6 @@ const Index = () => {
       <EducationSection />
       <ContactSection />
       <Footer />
-      <VapiAssistant />
     </div>
   );
 };
