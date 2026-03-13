@@ -59,7 +59,7 @@ const FloatingAssistant = () => {
             className="glass-card rounded-2xl border border-border w-72 overflow-hidden shadow-[0_8px_32px_hsl(0_0%_0%_/_0.5)]"
           >
             {/* Header */}
-            <div className="p-4 border-b border-border bg    -gradient-to-r from-primary/10 to    -	transparent">
+            <div className="p-4 border-b border-border bg-gradient-to-r from-primary/10 to-transparent">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-lg bg-primary/20 border border-primary/30 flex items-center justify-center">
