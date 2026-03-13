@@ -7,6 +7,7 @@ import TechSection from "@/components/TechSection";
 import EducationSection from "@/components/EducationSection";
 import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
+import FloatingAssistant from "@/components/FloatingAssistant";
 
 const Index = () => {
   return (
@@ -20,6 +21,7 @@ const Index = () => {
       <EducationSection />
       <ContactSection />
       <Footer />
+      <FloatingAssistant />
     </div>
   );
 };
