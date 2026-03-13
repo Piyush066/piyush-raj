@@ -1,10 +1,6 @@
-import { useState, useEffect, useRef } from "react";
-import { Menu, X, Mic, MicOff } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import Vapi from "@vapi-ai/web";
-
-const VAPI_PUBLIC_KEY = "0d456a9a-6dc8-4a8f-9abc-d281b1374496";
-const ASSISTANT_ID = "d5db0294-6ae8-45ae-b376-b024c6588945";
 
 const navLinks = [
   { href: "#home", label: "Home" },
@@ -19,9 +15,6 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState("#home");
-  const [vapiActive, setVapiActive] = useState(false);
-  const [vapiLoading, setVapiLoading] = useState(false);
-  const vapiRef = useRef<Vapi | null>(null);
 
   useEffect(() => {
     const onScroll = () => {
@@ -38,29 +31,6 @@ const Navbar = () => {
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
-  const toggleVapi = async () => {
-    if (vapiActive) {
-      vapiRef.current?.stop();
-      setVapiActive(false);
-      return;
-    }
-
-    setVapiLoading(true);
-    try {
-      if (!vapiRef.current) {
-        vapiRef.current = new Vapi(VAPI_PUBLIC_KEY);
-        vapiRef.current.on("call-end", () => setVapiActive(false));
-      }
-
-      await vapiRef.current.start(ASSISTANT_ID);
-      setVapiActive(true);
-    } catch (e) {
-      console.error("Vapi error:", e);
-    } finally {
-      setVapiLoading(false);
-    }
-  };
 
   return (
     <motion.nav
@@ -100,21 +70,6 @@ const Navbar = () => {
               )}
             </a>
           ))}
-          <button
-            onClick={toggleVapi}
-            disabled={vapiLoading}
-            className={`relative ml-2 px-5 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
-              vapiActive
-                ? "bg-primary text-primary-foreground shadow-[0_0_20px_hsl(24_95%_53%_/_0.4)]"
-                : "border border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground"
-            }`}
-          >
-            {vapiActive ? <MicOff size={16} /> : <Mic size={16} />}
-            <span>{vapiLoading ? "Connecting…" : vapiActive ? "End Call" : "Talk to Assistant"}</span>
-            {vapiActive && (
-              <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-primary animate-ping" />
-            )}
-          </button>
           <a
             href="#contact"
             className="ml-2 px-5 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:shadow-[0_0_20px_hsl(24_95%_53%_/_0.4)] transition-all duration-300"
@@ -153,21 +108,6 @@ const Navbar = () => {
                 {l.label}
               </a>
             ))}
-            <button
-              onClick={() => {
-                setOpen(false);
-                toggleVapi();
-              }}
-              disabled={vapiLoading}
-              className={`mt-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-center flex items-center justify-center gap-2 transition-all ${
-                vapiActive
-                  ? "bg-primary text-primary-foreground"
-                  : "border border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground"
-              }`}
-            >
-              {vapiActive ? <MicOff size={16} /> : <Mic size={16} />}
-              <span>{vapiLoading ? "Connecting…" : vapiActive ? "End Call" : "Talk to Assistant"}</span>
-            </button>
             <a
               href="#contact"
               onClick={() => setOpen(false)}
