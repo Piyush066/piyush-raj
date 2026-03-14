@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_leads: {
+        Row: {
+          budget: string | null
+          client_name: string | null
+          created_at: string
+          deadline: string | null
+          email: string | null
+          id: string
+          message: string | null
+          project_type: string | null
+          read: boolean
+        }
+        Insert: {
+          budget?: string | null
+          client_name?: string | null
+          created_at?: string
+          deadline?: string | null
+          email?: string | null
+          id?: string
+          message?: string | null
+          project_type?: string | null
+          read?: boolean
+        }
+        Update: {
+          budget?: string | null
+          client_name?: string | null
+          created_at?: string
+          deadline?: string | null
+          email?: string | null
+          id?: string
+          message?: string | null
+          project_type?: string | null
+          read?: boolean
+        }
+        Relationships: []
+      }
       contact_messages: {
         Row: {
           budget: string | null
