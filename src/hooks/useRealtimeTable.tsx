@@ -16,7 +16,7 @@ export function useRealtimeTable<T extends Record<string, any>>(
       .from(table)
       .select("*")
       .order(orderBy, { ascending });
-    setData((rows as T[]) || []);
+    setData((rows as unknown as T[]) || []);
     setLoading(false);
   }, [table, orderBy, ascending]);
 
