@@ -25,6 +25,8 @@ export type Database = {
           message: string | null
           project_type: string | null
           read: boolean
+          source: string | null
+          whatsapp: string | null
         }
         Insert: {
           budget?: string | null
@@ -36,6 +38,8 @@ export type Database = {
           message?: string | null
           project_type?: string | null
           read?: boolean
+          source?: string | null
+          whatsapp?: string | null
         }
         Update: {
           budget?: string | null
@@ -47,6 +51,8 @@ export type Database = {
           message?: string | null
           project_type?: string | null
           read?: boolean
+          source?: string | null
+          whatsapp?: string | null
         }
         Relationships: []
       }
