@@ -1,63 +1,40 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Mail, Trash2, Eye, EyeOff, Bot, User } from "lucide-react";
+import { Loader2, Mail, Trash2, Eye, EyeOff, Bot, Phone } from "lucide-react";
+import { useRealtimeTable } from "@/hooks/useRealtimeTable";
+import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "@/hooks/use-toast";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Message = Tables<"contact_messages">;
-
-interface Lead {
-  id: string;
-  created_at: string;
-  client_name: string | null;
-  email: string | null;
-  project_type: string | null;
-  budget: string | null;
-  deadline: string | null;
-  message: string | null;
-  read: boolean;
-}
+type Lead = Tables<"ai_leads">;
 
 const MessagesPage = () => {
   const [tab, setTab] = useState<"messages" | "leads">("messages");
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [leads, setLeads] = useState<Lead[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: messages, loading: loadingMsgs } = useRealtimeTable<Message>("contact_messages");
+  const { data: leads, loading: loadingLeads } = useRealtimeTable<Lead>("ai_leads");
 
-  const fetchData = async () => {
-    const [msgRes, leadRes] = await Promise.all([
-      supabase.from("contact_messages").select("*").order("created_at", { ascending: false }),
-      supabase.from("ai_leads").select("*").order("created_at", { ascending: false }),
-    ]);
-    setMessages(msgRes.data || []);
-    setLeads((leadRes.data as Lead[]) || []);
-    setLoading(false);
-  };
-
-  useEffect(() => { fetchData(); }, []);
+  const loading = loadingMsgs || loadingLeads;
 
   const toggleRead = async (msg: Message) => {
     await supabase.from("contact_messages").update({ read: !msg.read }).eq("id", msg.id);
-    fetchData();
   };
 
   const toggleLeadRead = async (lead: Lead) => {
-    await supabase.from("ai_leads").update({ read: !lead.read } as any).eq("id", lead.id);
-    fetchData();
+    await supabase.from("ai_leads").update({ read: !lead.read }).eq("id", lead.id);
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this message?")) return;
     await supabase.from("contact_messages").delete().eq("id", id);
-    fetchData();
+    toast({ title: "Message deleted" });
   };
 
   const handleDeleteLead = async (id: string) => {
     if (!confirm("Delete this lead?")) return;
     await supabase.from("ai_leads").delete().eq("id", id);
-    fetchData();
+    toast({ title: "Lead deleted" });
   };
-
-  if (loading) return <div className="flex justify-center py-12"><Loader2 className="animate-spin text-primary" size={32} /></div>;
 
   return (
     <div>
@@ -82,15 +59,24 @@ const MessagesPage = () => {
             tab === "leads" ? "bg-primary text-primary-foreground" : "bg-secondary border border-border text-muted-foreground hover:text-foreground"
           }`}
         >
-          <Bot size={16} /> AI Assistant Leads
+          <Bot size={16} /> AI Voice Leads
           {leads.filter((l) => !l.read).length > 0 && (
             <span className="px-1.5 py-0.5 rounded-full bg-primary-foreground/20 text-[10px] font-bold">{leads.filter((l) => !l.read).length}</span>
           )}
         </button>
       </div>
 
+      {/* Loading skeletons */}
+      {loading && (
+        <div className="space-y-3">
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-28 w-full rounded-xl" />
+          ))}
+        </div>
+      )}
+
       {/* Contact Messages */}
-      {tab === "messages" && (
+      {!loading && tab === "messages" && (
         <div className="space-y-3">
           {messages.map((m) => (
             <div key={m.id} className={`glass-card rounded-xl p-5 border transition-all ${m.read ? "border-border" : "border-primary/30 bg-primary/5"}`}>
@@ -124,8 +110,8 @@ const MessagesPage = () => {
         </div>
       )}
 
-      {/* AI Assistant Leads */}
-      {tab === "leads" && (
+      {/* AI Voice Leads */}
+      {!loading && tab === "leads" && (
         <div className="space-y-3">
           {leads.map((l) => (
             <div key={l.id} className={`glass-card rounded-xl p-5 border transition-all ${l.read ? "border-border" : "border-primary/30 bg-primary/5"}`}>
@@ -135,12 +121,18 @@ const MessagesPage = () => {
                     <Bot size={14} className="text-primary shrink-0" />
                     <span className="text-foreground font-medium text-sm">{l.client_name || "Unknown"}</span>
                     {l.email && <span className="text-muted-foreground text-xs">({l.email})</span>}
+                    {(l as any).source === "voice_assistant" && (
+                      <span className="px-2 py-0.5 rounded-full bg-accent/20 text-accent text-[10px] font-semibold">AI VOICE LEAD</span>
+                    )}
                     {!l.read && <span className="px-2 py-0.5 rounded-full bg-primary/20 text-primary text-[10px] font-semibold">NEW</span>}
                   </div>
                   <div className="flex gap-3 text-xs text-muted-foreground mb-2 flex-wrap">
                     {l.project_type && <span>Type: {l.project_type}</span>}
                     {l.budget && <span>Budget: {l.budget}</span>}
                     {l.deadline && <span>Deadline: {l.deadline}</span>}
+                    {(l as any).whatsapp && (
+                      <span className="flex items-center gap-1"><Phone size={10} /> {(l as any).whatsapp}</span>
+                    )}
                   </div>
                   {l.message && <p className="text-muted-foreground text-sm">{l.message}</p>}
                   <p className="text-muted-foreground text-[10px] mt-2">{new Date(l.created_at).toLocaleString()}</p>
@@ -156,7 +148,7 @@ const MessagesPage = () => {
               </div>
             </div>
           ))}
-          {leads.length === 0 && <p className="text-center py-12 text-muted-foreground">No AI assistant leads yet.</p>}
+          {leads.length === 0 && <p className="text-center py-12 text-muted-foreground">No AI voice leads yet.</p>}
         </div>
       )}
     </div>

@@ -1,1 +1,4 @@
 project_id = "mdyiicpxzcunuejvhqoo"
+
+[functions.save_client_lead]
+verify_jwt = false
