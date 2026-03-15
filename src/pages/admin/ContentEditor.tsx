@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Save, Loader2 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { Loader2, Save } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface ContentItem {
   id?: string;
@@ -14,34 +15,32 @@ const defaultContent: ContentItem[] = [
   { section: "hero", key: "headline", value: "" },
   { section: "hero", key: "subheadline", value: "" },
   { section: "hero", key: "cta_text", value: "" },
-  { section: "about", key: "main_text", value: "" },
-  { section: "about", key: "sub_text", value: "" },
-  { section: "about", key: "skills_badge", value: "" },
-  { section: "about", key: "experience_years", value: "" },
-  { section: "skills", key: "specializations", value: "" },
+  { section: "about", key: "bio", value: "" },
+  { section: "about", key: "experience", value: "" },
+  { section: "about", key: "education", value: "" },
+  { section: "skills", key: "primary_skills", value: "" },
   { section: "skills", key: "tools", value: "" },
   { section: "contact", key: "email", value: "" },
   { section: "contact", key: "phone", value: "" },
   { section: "contact", key: "location", value: "" },
   { section: "social", key: "linkedin", value: "" },
   { section: "social", key: "github", value: "" },
-  { section: "social", key: "instagram", value: "" },
   { section: "social", key: "youtube", value: "" },
+  { section: "social", key: "instagram", value: "" },
 ];
 
 const ContentEditor = () => {
   const [content, setContent] = useState<ContentItem[]>(defaultContent);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const { toast } = useToast();
 
   useEffect(() => {
     const fetchContent = async () => {
       const { data } = await supabase.from("site_content").select("*");
-      if (data && data.length > 0) {
-        const merged = defaultContent.map((dc) => {
-          const found = data.find((d) => d.section === dc.section && d.key === dc.key);
-          return found ? { ...dc, id: found.id, value: found.value } : dc;
+      if (data) {
+        const merged = defaultContent.map((d) => {
+          const existing = data.find((r) => r.section === d.section && r.key === d.key);
+          return existing ? { ...d, id: existing.id, value: existing.value } : d;
         });
         setContent(merged);
       }
@@ -51,109 +50,81 @@ const ContentEditor = () => {
   }, []);
 
   const updateField = (section: string, key: string, value: string) => {
-    setContent((prev) =>
-      prev.map((c) => (c.section === section && c.key === key ? { ...c, value } : c))
-    );
+    setContent((prev) => prev.map((c) => (c.section === section && c.key === key ? { ...c, value } : c)));
   };
 
   const handleSave = async () => {
     setSaving(true);
     for (const item of content) {
-      if (!item.value) continue;
       if (item.id) {
         await supabase.from("site_content").update({ value: item.value }).eq("id", item.id);
-      } else {
-        await supabase.from("site_content").upsert(
-          { section: item.section, key: item.key, value: item.value },
-          { onConflict: "section,key" }
-        );
+      } else if (item.value) {
+        await supabase.from("site_content").insert({ section: item.section, key: item.key, value: item.value });
       }
     }
     setSaving(false);
-    toast({ title: "Saved!", description: "Website content updated. Changes are live." });
+    toast({ title: "Changes saved and published." });
   };
-
-  if (loading) return <div className="flex justify-center py-12"><Loader2 className="animate-spin text-primary" size={32} /></div>;
 
   const field = (label: string, section: string, key: string, multiline = false, placeholder = "") => {
     const item = content.find((c) => c.section === section && c.key === key);
-    const Component = multiline ? "textarea" : "input";
     return (
       <div>
-        <label className="text-muted-foreground text-xs font-medium block mb-1">{label}</label>
-        <Component
-          value={item?.value || ""}
-          placeholder={placeholder || label}
-          onChange={(e: any) => updateField(section, key, e.target.value)}
-          {...(multiline ? { rows: 4 } : {})}
-          className="w-full px-4 py-3 rounded-xl bg-secondary/50 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm resize-none"
-        />
+        <label className="text-xs text-muted-foreground font-medium mb-1 block capitalize">{label}</label>
+        {multiline ? (
+          <textarea rows={3} value={item?.value || ""} onChange={(e) => updateField(section, key, e.target.value)} placeholder={placeholder} className="w-full bg-secondary border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:border-primary/50 outline-none resize-none" />
+        ) : (
+          <input value={item?.value || ""} onChange={(e) => updateField(section, key, e.target.value)} placeholder={placeholder} className="w-full bg-secondary border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:border-primary/50 outline-none" />
+        )}
       </div>
     );
   };
 
   return (
     <div>
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-3">
+      <div className="flex items-center justify-between mb-6">
         <h1 className="font-heading text-2xl font-bold text-foreground">Website Content</h1>
-        <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-50">
-          {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-          {saving ? "Saving…" : "Save All"}
+        <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:brightness-110 transition-all">
+          {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />} {saving ? "Saving..." : "Save & Publish"}
         </button>
       </div>
 
-      <div className="space-y-6">
-        {/* Hero Section */}
-        <div className="glass-card rounded-xl p-6 border border-border">
-          <h3 className="font-heading font-bold text-sm uppercase tracking-widest text-primary mb-4">Hero Section</h3>
-          <div className="space-y-3">
-            {field("Headline", "hero", "headline", false, "e.g. I Create Stunning Videos")}
-            {field("Sub-headline", "hero", "subheadline", true, "Brief intro text below the headline")}
-            {field("CTA Button Text", "hero", "cta_text", false, "e.g. View My Work")}
+      {loading ? (
+        <div className="space-y-4">{[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-32 w-full rounded-xl" />)}</div>
+      ) : (
+        <div className="space-y-6">
+          <div className="glass-card rounded-xl border border-border p-5 space-y-4">
+            <h2 className="font-heading font-bold text-sm uppercase tracking-widest text-primary">Hero Section</h2>
+            {field("Headline", "hero", "headline", false, "Your main headline")}
+            {field("Sub-headline", "hero", "subheadline", true, "Supporting text")}
+            {field("CTA Button Text", "hero", "cta_text", false, "View My Work")}
           </div>
-        </div>
-
-        {/* About Section */}
-        <div className="glass-card rounded-xl p-6 border border-border">
-          <h3 className="font-heading font-bold text-sm uppercase tracking-widest text-primary mb-4">About Section</h3>
-          <div className="space-y-3">
-            {field("Main Text", "about", "main_text", true, "Your main about description")}
-            {field("Sub Text", "about", "sub_text", true, "Additional details")}
-            {field("Skills Badge", "about", "skills_badge", false, "e.g. Video Editor & Motion Designer")}
-            {field("Experience Years", "about", "experience_years", false, "e.g. 5+")}
+          <div className="glass-card rounded-xl border border-border p-5 space-y-4">
+            <h2 className="font-heading font-bold text-sm uppercase tracking-widest text-primary">About</h2>
+            {field("Bio", "about", "bio", true, "Your bio / description")}
+            {field("Experience Summary", "about", "experience", true)}
+            {field("Education", "about", "education", true)}
           </div>
-        </div>
-
-        {/* Skills Section */}
-        <div className="glass-card rounded-xl p-6 border border-border">
-          <h3 className="font-heading font-bold text-sm uppercase tracking-widest text-primary mb-4">Skills & Tools</h3>
-          <div className="space-y-3">
-            {field("Specializations", "skills", "specializations", true, "Comma-separated list of skills")}
-            {field("Tools & Software", "skills", "tools", true, "Comma-separated list of tools")}
+          <div className="glass-card rounded-xl border border-border p-5 space-y-4">
+            <h2 className="font-heading font-bold text-sm uppercase tracking-widest text-primary">Skills</h2>
+            {field("Primary Skills (comma-separated)", "skills", "primary_skills", true)}
+            {field("Tools & Software (comma-separated)", "skills", "tools", true)}
           </div>
-        </div>
-
-        {/* Contact Info */}
-        <div className="glass-card rounded-xl p-6 border border-border">
-          <h3 className="font-heading font-bold text-sm uppercase tracking-widest text-primary mb-4">Contact Info</h3>
-          <div className="grid sm:grid-cols-2 gap-3">
+          <div className="glass-card rounded-xl border border-border p-5 space-y-4">
+            <h2 className="font-heading font-bold text-sm uppercase tracking-widest text-primary">Contact</h2>
             {field("Email", "contact", "email", false, "your@email.com")}
-            {field("Phone", "contact", "phone", false, "+91 ...")}
-            {field("Location", "contact", "location", false, "City, Country")}
+            {field("Phone", "contact", "phone")}
+            {field("Location", "contact", "location")}
+          </div>
+          <div className="glass-card rounded-xl border border-border p-5 space-y-4">
+            <h2 className="font-heading font-bold text-sm uppercase tracking-widest text-primary">Social Links</h2>
+            {field("LinkedIn", "social", "linkedin", false, "https://linkedin.com/in/...")}
+            {field("GitHub", "social", "github", false, "https://github.com/...")}
+            {field("YouTube", "social", "youtube", false, "https://youtube.com/...")}
+            {field("Instagram", "social", "instagram", false, "https://instagram.com/...")}
           </div>
         </div>
-
-        {/* Social Links */}
-        <div className="glass-card rounded-xl p-6 border border-border">
-          <h3 className="font-heading font-bold text-sm uppercase tracking-widest text-primary mb-4">Social Links</h3>
-          <div className="grid sm:grid-cols-2 gap-3">
-            {field("LinkedIn URL", "social", "linkedin")}
-            {field("GitHub URL", "social", "github")}
-            {field("Instagram URL", "social", "instagram")}
-            {field("YouTube URL", "social", "youtube")}
-          </div>
-        </div>
-      </div>
+      )}
     </div>
   );
 };
