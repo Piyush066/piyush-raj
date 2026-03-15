@@ -24,6 +24,12 @@ const FloatingAssistant = () => {
       if (!vapiRef.current) {
         vapiRef.current = new Vapi(VAPI_PUBLIC_KEY);
         vapiRef.current.on("call-end", () => setActive(false));
+        vapiRef.current.on("message", (msg: any) => {
+          console.log("[Vapi message]", msg);
+          if (msg?.type === "function-call" && msg?.functionCall?.name === "save_client_lead") {
+            console.log("[AI Lead captured]", msg.functionCall.parameters);
+          }
+        });
       }
       await vapiRef.current.start(ASSISTANT_ID);
       setActive(true);
