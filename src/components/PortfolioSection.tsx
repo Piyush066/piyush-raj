@@ -5,30 +5,13 @@ import { Play, X, ExternalLink } from "lucide-react";
 import { useRealtimeTable } from "@/hooks/useRealtimeTable";
 import type { Tables } from "@/integrations/supabase/types";
 
-const categories = ["All", "Brand Videos", "Reels & Shorts", "YouTube Videos", "Ads & UGC"];
-
-// Map DB category values to display categories
-const categoryMap: Record<string, string> = {
-  "brand": "Brand Videos",
-  "reels": "Reels & Shorts",
-  "youtube": "YouTube Videos",
-  "ads": "Ads & UGC",
-  "Brand Videos": "Brand Videos",
-  "Reels & Shorts": "Reels & Shorts",
-  "YouTube Videos": "YouTube Videos",
-  "Ads & UGC": "Ads & UGC",
-};
-
-const categoryShowcase: Record<string, { label: string; title: string }> = {
-  "Brand Videos": { label: "BRAND VIDEOS", title: "Brand Video Showcase" },
-  "Reels & Shorts": { label: "REELS & SHORTS", title: "Viral Reels Showcase" },
-  "YouTube Videos": { label: "YOUTUBE VIDEOS", title: "YouTube Showcase" },
-  "Ads & UGC": { label: "ADS & UGC", title: "Ad Campaign Showcase" },
-};
+type Section = Tables<"portfolio_sections">;
+type Video = Tables<"portfolio_videos">;
 
 interface Project {
   title: string;
   category: string;
+  sectionId: string;
   youtubeUrl: string;
   thumbnailUrl?: string | null;
 }
@@ -47,14 +30,6 @@ function getThumbnail(project: Project): string {
   const id = getYouTubeId(project.youtubeUrl);
   return id ? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : "";
 }
-
-// Hardcoded fallback
-const fallbackProjects: Project[] = [
-  { title: "Video 1", category: "Brand Videos", youtubeUrl: "https://youtube.com/shorts/d9hrI5rOUVE" },
-  { title: "Video 1", category: "Reels & Shorts", youtubeUrl: "https://youtube.com/shorts/xtnNK8Ox2fM" },
-  { title: "Video 1", category: "YouTube Videos", youtubeUrl: "https://youtube.com/shorts/_SaHb7iHVoE" },
-  { title: "Video 1", category: "Ads & UGC", youtubeUrl: "https://youtube.com/shorts/jHg8fxezC3E" },
-];
 
 /* ─── Video Card ─── */
 const VideoCard = ({ project, onClick }: { project: Project; onClick: () => void }) => (
@@ -98,10 +73,8 @@ const VideoPlayerModal = ({ project, onClose }: { project: Project; onClose: () 
 };
 
 /* ─── Category Modal ─── */
-const CategoryModal = ({ category, projects, onClose }: { category: string; projects: Project[]; onClose: () => void }) => {
+const CategoryModal = ({ sectionName, projects, onClose }: { sectionName: string; projects: Project[]; onClose: () => void }) => {
   const [playerProject, setPlayerProject] = useState<Project | null>(null);
-  const showcase = categoryShowcase[category];
-  const categoryProjects = projects.filter((p) => p.category === category);
 
   useEffect(() => { document.body.style.overflow = "hidden"; return () => { document.body.style.overflow = ""; }; }, []);
 
@@ -111,15 +84,15 @@ const CategoryModal = ({ category, projects, onClose }: { category: string; proj
         <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} transition={{ duration: 0.25 }} className="glass-card rounded-2xl max-w-3xl w-full border border-border max-h-[90vh] flex flex-col overflow-hidden" onClick={(e) => e.stopPropagation()}>
           <div className="flex justify-between items-start p-6 pb-4 border-b border-border shrink-0">
             <div>
-              <span className="text-xs font-heading font-bold text-primary uppercase tracking-widest">{showcase?.label}</span>
-              <h3 className="font-heading text-2xl font-bold text-foreground mt-1">{showcase?.title}</h3>
+              <span className="text-xs font-heading font-bold text-primary uppercase tracking-widest">{sectionName.toUpperCase()}</span>
+              <h3 className="font-heading text-2xl font-bold text-foreground mt-1">{sectionName} Showcase</h3>
             </div>
             <button onClick={onClose} className="w-8 h-8 rounded-lg bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"><X size={16} /></button>
           </div>
           <div className="flex-1 overflow-y-auto overscroll-contain modal-scroll">
             <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {categoryProjects.map((p, i) => (
-                <VideoCard key={`${p.category}-${p.title}-${i}`} project={p} onClick={() => setPlayerProject(p)} />
+              {projects.map((p, i) => (
+                <VideoCard key={`${p.sectionId}-${p.title}-${i}`} project={p} onClick={() => setPlayerProject(p)} />
               ))}
             </div>
           </div>
@@ -137,38 +110,32 @@ const PortfolioSection = () => {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-100px" });
   const [filter, setFilter] = useState("All");
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedSection, setSelectedSection] = useState<{ id: string; name: string } | null>(null);
 
-  const { data: dbVideos } = useRealtimeTable<Tables<"portfolio_videos">>("portfolio_videos", "display_order", true);
+  const { data: dbSections } = useRealtimeTable<Section>("portfolio_sections", "display_order", true);
+  const { data: dbVideos } = useRealtimeTable<Video>("portfolio_videos", "display_order", true);
 
-  // Map DB rows to Project
-  const allProjects: Project[] = dbVideos.length > 0
-    ? dbVideos.map((v) => ({
-        title: v.title,
-        category: categoryMap[v.category] || v.category,
-        youtubeUrl: v.youtube_url || v.drive_url || "",
-        thumbnailUrl: v.thumbnail_url,
-      }))
-    : fallbackProjects;
+  const sectionMap = new Map(dbSections.map((s) => [s.id, s.name]));
 
-  // For grid: show one per category (first video)
-  const seenCats = new Set<string>();
-  const gridProjects = allProjects.filter((p) => {
-    if (seenCats.has(p.category)) return false;
-    seenCats.add(p.category);
-    return true;
-  });
+  const allProjects: Project[] = dbVideos.map((v) => ({
+    title: v.title,
+    category: sectionMap.get(v.section_id || "") || v.category,
+    sectionId: v.section_id || "",
+    youtubeUrl: v.youtube_url || v.drive_url || "",
+    thumbnailUrl: v.thumbnail_url,
+  }));
 
-  useEffect(() => {
-    const handler = (e: Event) => {
-      const category = (e as CustomEvent).detail?.category;
-      if (category && categories.includes(category)) setFilter(category);
-    };
-    window.addEventListener("navigate-portfolio", handler);
-    return () => window.removeEventListener("navigate-portfolio", handler);
-  }, []);
+  // Grid: one card per section (first video as thumbnail)
+  const gridCards = dbSections
+    .filter((s) => allProjects.some((p) => p.sectionId === s.id))
+    .map((s) => {
+      const first = allProjects.find((p) => p.sectionId === s.id)!;
+      return { ...first, category: s.name, sectionId: s.id };
+    });
 
-  const filtered = filter === "All" ? gridProjects : gridProjects.filter((p) => p.category === filter);
+  const filteredGrid = filter === "All" ? gridCards : gridCards.filter((p) => p.sectionId === filter);
+
+  const filterOptions = [{ id: "All", name: "All" }, ...dbSections];
 
   return (
     <section id="portfolio" className="section-padding relative overflow-hidden" ref={ref}>
@@ -181,22 +148,22 @@ const PortfolioSection = () => {
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={inView ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.2 }} className="flex flex-wrap justify-center gap-2 mb-12">
-          {categories.map((c) => (
-            <button key={c} onClick={() => setFilter(c)} className={`relative px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 ${filter === c ? "bg-primary text-primary-foreground shadow-[0_0_20px_hsl(var(--primary)_/_0.3)]" : "bg-secondary/80 text-muted-foreground hover:text-foreground hover:bg-secondary border border-transparent hover:border-border"}`}>{c}</button>
+          {filterOptions.map((opt) => (
+            <button key={opt.id} onClick={() => setFilter(opt.id)} className={`relative px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 ${filter === opt.id ? "bg-primary text-primary-foreground shadow-[0_0_20px_hsl(var(--primary)_/_0.3)]" : "bg-secondary/80 text-muted-foreground hover:text-foreground hover:bg-secondary border border-transparent hover:border-border"}`}>{opt.name}</button>
           ))}
         </motion.div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <AnimatePresence mode="popLayout">
-            {filtered.map((p, i) => (
+            {filteredGrid.map((p, i) => (
               <motion.div
-                key={`${p.category}-${p.title}`}
+                key={p.sectionId}
                 layout
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.4, delay: i * 0.05 }}
-                onClick={() => setSelectedCategory(p.category)}
+                onClick={() => setSelectedSection({ id: p.sectionId, name: p.category })}
                 className="group glass-card rounded-2xl overflow-hidden border border-border hover:border-primary/40 cursor-pointer transition-all duration-500"
               >
                 <div className="aspect-video relative overflow-hidden bg-background">
@@ -220,9 +187,17 @@ const PortfolioSection = () => {
           </AnimatePresence>
         </div>
 
-        {selectedCategory && createPortal(
+        {filteredGrid.length === 0 && dbVideos.length === 0 && (
+          <p className="text-center py-12 text-muted-foreground">No portfolio items yet.</p>
+        )}
+
+        {selectedSection && createPortal(
           <AnimatePresence>
-            <CategoryModal category={selectedCategory} projects={allProjects} onClose={() => setSelectedCategory(null)} />
+            <CategoryModal
+              sectionName={selectedSection.name}
+              projects={allProjects.filter((p) => p.sectionId === selectedSection.id)}
+              onClose={() => setSelectedSection(null)}
+            />
           </AnimatePresence>,
           document.body
         )}
