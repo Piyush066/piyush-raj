@@ -57,10 +57,23 @@ const ContentEditor = () => {
     setSaving(true);
     for (const item of content) {
       if (item.id) {
-        await supabase.from("site_content").update({ value: item.value }).eq("id", item.id);
+        const { data, error } = await supabase.from("site_content").update({ value: item.value }).eq("id", item.id).select();
+        if (error) console.error("[ContentEditor] Update error:", error);
+        else console.log("[ContentEditor] Updated:", data);
       } else if (item.value) {
-        await supabase.from("site_content").insert({ section: item.section, key: item.key, value: item.value });
+        const { data, error } = await supabase.from("site_content").insert({ section: item.section, key: item.key, value: item.value }).select();
+        if (error) console.error("[ContentEditor] Insert error:", error);
+        else console.log("[ContentEditor] Inserted:", data);
       }
+    }
+    // Re-fetch to get fresh IDs for newly inserted rows
+    const { data: fresh } = await supabase.from("site_content").select("*");
+    if (fresh) {
+      const merged = defaultContent.map((d) => {
+        const existing = fresh.find((r) => r.section === d.section && r.key === d.key);
+        return existing ? { ...d, id: existing.id, value: existing.value } : d;
+      });
+      setContent(merged);
     }
     setSaving(false);
     toast({ title: "Changes saved and published." });
