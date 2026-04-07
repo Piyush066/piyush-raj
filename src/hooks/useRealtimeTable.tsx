@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-type TableName = "portfolio_videos" | "services" | "site_content" | "ai_leads" | "contact_messages";
+type TableName = "portfolio_videos" | "portfolio_sections" | "services" | "site_content" | "ai_leads" | "contact_messages";
 
 export function useRealtimeTable<T extends Record<string, any>>(
   table: TableName,
