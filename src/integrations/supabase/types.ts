@@ -89,6 +89,30 @@ export type Database = {
         }
         Relationships: []
       }
+      portfolio_sections: {
+        Row: {
+          created_at: string
+          display_order: number
+          id: string
+          name: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          name: string
+          slug: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          name?: string
+          slug?: string
+        }
+        Relationships: []
+      }
       portfolio_videos: {
         Row: {
           category: string
@@ -96,6 +120,7 @@ export type Database = {
           display_order: number
           drive_url: string | null
           id: string
+          section_id: string | null
           thumbnail_url: string | null
           title: string
           updated_at: string
@@ -107,6 +132,7 @@ export type Database = {
           display_order?: number
           drive_url?: string | null
           id?: string
+          section_id?: string | null
           thumbnail_url?: string | null
           title: string
           updated_at?: string
@@ -118,12 +144,21 @@ export type Database = {
           display_order?: number
           drive_url?: string | null
           id?: string
+          section_id?: string | null
           thumbnail_url?: string | null
           title?: string
           updated_at?: string
           youtube_url?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "portfolio_videos_section_id_fkey"
+            columns: ["section_id"]
+            isOneToOne: false
+            referencedRelation: "portfolio_sections"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       services: {
         Row: {
