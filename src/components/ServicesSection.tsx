@@ -15,173 +15,61 @@ import {
   Users,
   TrendingUp,
   PlayCircle,
+  Loader2,
 } from "lucide-react";
+import { useRealtimeTable } from "@/hooks/useRealtimeTable";
+import type { Tables } from "@/integrations/supabase/types";
 
+const iconMap: Record<string, React.ElementType> = {
+  Film, Smartphone, Youtube, Megaphone,
+};
 
-const services = [
-  {
-    icon: Film,
-    title: "Brand Videos",
-    desc: "Cinematic brand films that tell your story and captivate audiences.",
-    num: "01",
-    details: {
-      summary:
-        "I craft compelling brand videos that communicate your vision, build trust, and leave a lasting impression on your audience.",
-      features: [
-        "Cinematic intros & outros",
-        "Narrative-driven storytelling",
-        "Custom graphics & text animations",
-        "Color grading & audio mixing",
-        "Brand identity integration",
-        "Multi-platform delivery",
-      ],
-      process: [
-        "Receive raw footage & creative brief",
-        "Structure narrative arc & pacing",
-        "First cut with rough edits",
-        "Add graphics, music & sound design",
-        "Two rounds of revisions",
-        "Final export in optimized formats",
-      ],
-      audience: [
-        "Brands building awareness",
-        "Startups & agencies",
-        "Corporate teams",
-        "Entrepreneurs & founders",
-      ],
-      results: [
-        "Elevated brand perception",
-        "Stronger audience connection",
-        "Professional-grade content",
-        "Consistent visual identity",
-      ],
-      turnaround: "3–5 business days",
-      exampleProject: { title: "Brand Story Documentary", id: "project-brand-story-documentary" },
-    },
-  },
-  {
-    icon: Smartphone,
-    title: "Reels & Shorts",
-    desc: "Scroll-stopping short-form content optimized for virality.",
-    num: "02",
-    details: {
-      summary:
-        "I create punchy, fast-paced short-form content that stops the scroll and drives massive engagement across Instagram Reels, YouTube Shorts, and TikTok.",
-      features: [
-        "Trending audio & effect integration",
-        "Quick-cut storytelling hooks",
-        "Auto-captions with branded styling",
-        "Aspect-ratio optimization (9:16)",
-        "Platform-specific formatting",
-        "Batch delivery for content calendars",
-      ],
-      process: [
-        "Content strategy alignment call",
-        "Select trending hooks & formats",
-        "Edit with fast-paced cuts & captions",
-        "Add branded overlays & CTAs",
-        "One revision round",
-        "Deliver batch-ready files",
-      ],
-      audience: [
-        "Influencers & content creators",
-        "Brands launching social campaigns",
-        "Coaches & personal brands",
-        "E-commerce & DTC brands",
-      ],
-      results: [
-        "Higher engagement rates",
-        "Faster follower growth",
-        "Consistent content pipeline",
-        "Algorithm-friendly formatting",
-      ],
-      turnaround: "1–2 business days",
-      exampleProject: { title: "Viral Product Launch Reel", id: "project-viral-product-launch-reel" },
-    },
-  },
-  {
-    icon: Youtube,
-    title: "YouTube Videos",
-    desc: "Engaging edits that maximize watch time and audience retention.",
-    num: "03",
-    details: {
-      summary:
-        "I craft compelling YouTube videos that keep viewers glued from intro to outro. Every cut, transition, and effect is designed to boost watch time and grow your channel.",
-      features: [
-        "Cinematic intros & outros",
-        "Pattern-interrupt cuts to maintain attention",
-        "Custom lower thirds & text animations",
-        "Color grading & audio mixing",
-        "Thumbnail-worthy frame selection",
-        "SEO-optimized chapter markers",
-      ],
-      process: [
-        "Receive raw footage & creative brief",
-        "Structure narrative arc & pacing",
-        "First cut with rough edits",
-        "Add graphics, music & sound design",
-        "Two rounds of revisions",
-        "Final export in platform-optimized formats",
-      ],
-      audience: [
-        "YouTubers scaling their channel",
-        "Educators & course creators",
-        "Tech reviewers & product channels",
-        "Vlog & lifestyle creators",
-      ],
-      results: [
-        "Higher average watch time",
-        "Better audience retention",
-        "More consistent uploads",
-        "Professional channel identity",
-      ],
-      turnaround: "3–5 business days",
-      exampleProject: { title: "Brand Story Documentary", id: "project-brand-story-documentary" },
-    },
-  },
-  {
-    icon: Megaphone,
-    title: "Ads & UGC",
-    desc: "High-converting ad creatives and UGC-style content that drives action.",
-    num: "04",
-    details: {
-      summary:
-        "I design scroll-stopping ad creatives and authentic UGC-style content that converts viewers into customers. Every frame is strategically crafted to drive clicks, sign-ups, and sales.",
-      features: [
-        "Hook-driven opening frames",
-        "A/B test variations included",
-        "CTA overlays & end cards",
-        "Platform ad-spec compliance",
-        "UGC-style editing",
-        "Performance-focused iteration",
-      ],
-      process: [
-        "Review product/service & target audience",
-        "Script hook variations",
-        "Edit 2–3 creative variations",
-        "Add CTA overlays & captions",
-        "Platform-spec quality check",
-        "Deliver with A/B test notes",
-      ],
-      audience: [
-        "DTC & e-commerce brands",
-        "SaaS companies running paid ads",
-        "Marketing agencies",
-        "App & product launches",
-      ],
-      results: [
-        "Lower cost per acquisition",
-        "Higher click-through rates",
-        "Faster creative testing cycles",
-        "Scalable ad production pipeline",
-      ],
-      turnaround: "2–4 business days",
-      exampleProject: { title: "E-commerce Ad Campaign", id: "project-e-commerce-ad-campaign" },
-    },
-  },
+// Fallback hardcoded services (used only if DB is empty)
+const fallbackServices = [
+  { icon_name: "Film", title: "Brand Videos", description: "Cinematic brand films that tell your story and captivate audiences.", num: "01", summary: "I craft compelling brand videos.", features: ["Cinematic intros & outros", "Narrative-driven storytelling", "Custom graphics", "Color grading & audio mixing"], process_steps: ["Receive raw footage", "Structure narrative", "First cut", "Add graphics & sound", "Revisions", "Final export"], audience: ["Brands", "Startups", "Corporate teams"], results: ["Elevated perception", "Stronger connection", "Professional content"], turnaround: "3–5 days", example_title: "Brand Story Documentary" },
+  { icon_name: "Smartphone", title: "Reels & Shorts", description: "Scroll-stopping short-form content optimized for virality.", num: "02", summary: "Punchy short-form content.", features: ["Trending audio", "Quick-cut hooks", "Auto-captions", "Platform optimization"], process_steps: ["Strategy call", "Select hooks", "Edit", "Branded overlays", "Revision", "Deliver"], audience: ["Influencers", "Brands", "Coaches", "E-commerce"], results: ["Higher engagement", "Faster growth", "Consistent pipeline"], turnaround: "1–2 days", example_title: "Viral Product Launch Reel" },
+  { icon_name: "Youtube", title: "YouTube Videos", description: "Engaging edits that maximize watch time and audience retention.", num: "03", summary: "Keep viewers glued.", features: ["Cinematic intros", "Pattern-interrupt cuts", "Custom lower thirds", "Color grading"], process_steps: ["Receive footage", "Structure arc", "First cut", "Add graphics", "Revisions", "Final export"], audience: ["YouTubers", "Educators", "Tech reviewers", "Vloggers"], results: ["Higher watch time", "Better retention", "Consistent uploads"], turnaround: "3–5 days", example_title: "Brand Story Documentary" },
+  { icon_name: "Megaphone", title: "Ads & UGC", description: "High-converting ad creatives and UGC-style content that drives action.", num: "04", summary: "Scroll-stopping ad creatives.", features: ["Hook-driven frames", "A/B variations", "CTA overlays", "UGC-style editing"], process_steps: ["Review audience", "Script hooks", "Edit variations", "Add CTAs", "Quality check", "Deliver"], audience: ["DTC brands", "SaaS companies", "Agencies", "Product launches"], results: ["Lower CPA", "Higher CTR", "Faster testing", "Scalable pipeline"], turnaround: "2–4 days", example_title: "E-commerce Ad Campaign" },
 ];
 
-type Service = (typeof services)[number];
+type ServiceRow = Tables<"services">;
+
+interface ServiceData {
+  icon: React.ElementType;
+  title: string;
+  desc: string;
+  num: string;
+  details: {
+    summary: string;
+    features: string[];
+    process: string[];
+    audience: string[];
+    results: string[];
+    turnaround: string;
+    exampleProject: { title: string; id: string };
+  };
+}
+
+function mapService(s: ServiceRow | typeof fallbackServices[number]): ServiceData {
+  return {
+    icon: iconMap[s.icon_name] || Film,
+    title: s.title,
+    desc: s.description,
+    num: s.num,
+    details: {
+      summary: s.summary || s.description,
+      features: s.features || [],
+      process: s.process_steps || [],
+      audience: s.audience || [],
+      results: ('results' in s ? s.results : []) || [],
+      turnaround: s.turnaround || "3–5 days",
+      exampleProject: {
+        title: s.example_title || s.title,
+        id: `project-${s.title.toLowerCase().replace(/\s+/g, "-")}`,
+      },
+    },
+  };
+}
 
 const SectionCard = ({
   icon: Icon,
@@ -209,16 +97,14 @@ const ServiceModal = ({
   service,
   onClose,
 }: {
-  service: Service;
+  service: ServiceData;
   onClose: () => void;
 }) => {
   const Icon = service.icon;
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = "";
-    };
+    return () => { document.body.style.overflow = ""; };
   }, []);
 
   return (
@@ -231,7 +117,6 @@ const ServiceModal = ({
       onClick={onClose}
     >
       <div className="absolute inset-0 bg-background/80 backdrop-blur-md" />
-
       <motion.div
         className="relative z-10 w-full max-w-2xl glass-card rounded-2xl border border-border overflow-hidden"
         style={{ maxHeight: "90vh" }}
@@ -242,110 +127,79 @@ const ServiceModal = ({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-accent z-20" />
-
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-primary/20 transition-colors z-20"
-        >
+        <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-primary/20 transition-colors z-20">
           <X size={16} />
         </button>
-
         <div className="overflow-y-auto modal-scroll" style={{ maxHeight: "90vh" }}>
           <div className="p-7 space-y-5">
-            {/* 1. Title */}
             <div className="flex items-center gap-4 pr-8">
               <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
                 <Icon size={26} className="text-primary" />
               </div>
               <div>
-                <span className="text-xs font-semibold text-primary tracking-widest">
-                  SERVICE {service.num}
-                </span>
-                <h3 className="font-heading font-bold text-2xl text-foreground">
-                  {service.title}
-                </h3>
+                <span className="text-xs font-semibold text-primary tracking-widest">SERVICE {service.num}</span>
+                <h3 className="font-heading font-bold text-2xl text-foreground">{service.title}</h3>
               </div>
             </div>
+            <p className="text-muted-foreground text-sm leading-relaxed">{service.details.summary}</p>
 
-            {/* 2. Description */}
-            <p className="text-muted-foreground text-sm leading-relaxed">
-              {service.details.summary}
-            </p>
-
-            {/* 3. What You Get */}
             <SectionCard icon={CheckCircle2} title="What You Get">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {service.details.features.map((f) => (
                   <div key={f} className="flex items-start gap-2 text-sm text-muted-foreground">
-                    <CheckCircle2 size={14} className="text-primary mt-0.5 shrink-0" />
-                    {f}
+                    <CheckCircle2 size={14} className="text-primary mt-0.5 shrink-0" />{f}
                   </div>
                 ))}
               </div>
             </SectionCard>
 
-            {/* 4. My Process */}
             <SectionCard icon={ListChecks} title="My Process">
               <ol className="space-y-2">
                 {service.details.process.map((step, i) => (
                   <li key={step} className="flex items-start gap-3 text-sm text-muted-foreground">
-                    <span className="w-5 h-5 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-[10px] font-bold text-primary shrink-0 mt-0.5">
-                      {i + 1}
-                    </span>
+                    <span className="w-5 h-5 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-[10px] font-bold text-primary shrink-0 mt-0.5">{i + 1}</span>
                     {step}
                   </li>
                 ))}
               </ol>
             </SectionCard>
 
-            {/* 5. Who This Is For */}
             <SectionCard icon={Users} title="Who This Is For">
               <div className="flex flex-wrap gap-2">
                 {service.details.audience.map((a) => (
                   <span key={a} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/5 border border-primary/10 text-xs text-muted-foreground">
-                    <Target size={10} className="text-primary" />
-                    {a}
+                    <Target size={10} className="text-primary" />{a}
                   </span>
                 ))}
               </div>
             </SectionCard>
 
-            {/* 6. Expected Results */}
             <SectionCard icon={BarChart3} title="Expected Results">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {service.details.results.map((r) => (
                   <div key={r} className="flex items-start gap-2 text-sm text-muted-foreground">
-                    <TrendingUp size={14} className="text-primary mt-0.5 shrink-0" />
-                    {r}
+                    <TrendingUp size={14} className="text-primary mt-0.5 shrink-0" />{r}
                   </div>
                 ))}
               </div>
             </SectionCard>
 
-            {/* 7. See Real Example */}
             <div className="rounded-xl bg-primary/5 border border-primary/20 p-4 flex items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
                   <PlayCircle size={16} className="text-primary" />
                 </div>
                 <div>
-                  <p className="text-xs font-heading font-bold text-primary uppercase tracking-widest">
-                    See Real Example
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    {service.details.exampleProject.title}
-                  </p>
+                  <p className="text-xs font-heading font-bold text-primary uppercase tracking-widest">See Real Example</p>
+                  <p className="text-sm text-muted-foreground">{service.details.exampleProject.title}</p>
                 </div>
               </div>
               <button
                 onClick={() => {
                   onClose();
                   setTimeout(() => {
-                    window.dispatchEvent(
-                      new CustomEvent("navigate-portfolio", { detail: { category: service.title } })
-                    );
-                    const section = document.getElementById("portfolio");
-                    if (section) section.scrollIntoView({ behavior: "smooth", block: "start" });
+                    window.dispatchEvent(new CustomEvent("navigate-portfolio", { detail: { category: service.title } }));
+                    document.getElementById("portfolio")?.scrollIntoView({ behavior: "smooth", block: "start" });
                   }, 350);
                 }}
                 className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-secondary border border-border text-xs font-semibold text-foreground hover:border-primary/40 hover:text-primary transition-all shrink-0"
@@ -354,19 +208,11 @@ const ServiceModal = ({
               </button>
             </div>
 
-            {/* Footer: Turnaround + CTA */}
             <div className="flex items-center justify-between pt-4 border-t border-border">
               <div className="text-xs text-muted-foreground">
-                Turnaround:{" "}
-                <span className="text-foreground font-medium">
-                  {service.details.turnaround}
-                </span>
+                Turnaround: <span className="text-foreground font-medium">{service.details.turnaround}</span>
               </div>
-              <a
-                href="#contact"
-                onClick={onClose}
-                className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-primary text-primary-foreground text-sm font-semibold hover:brightness-110 transition-all"
-              >
+              <a href="#contact" onClick={onClose} className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-primary text-primary-foreground text-sm font-semibold hover:brightness-110 transition-all">
                 Get Started <ArrowUpRight size={14} />
               </a>
             </div>
@@ -380,17 +226,16 @@ const ServiceModal = ({
 const ServicesSection = () => {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-100px" });
-  const [selected, setSelected] = useState<Service | null>(null);
+  const [selected, setSelected] = useState<ServiceData | null>(null);
+
+  const { data: dbServices, loading } = useRealtimeTable<Tables<"services">>("services", "display_order", true);
+
+  const services: ServiceData[] = (dbServices.length > 0 ? dbServices : fallbackServices).map(mapService);
 
   return (
     <>
-      <section
-        id="services"
-        className="section-padding relative overflow-hidden"
-        ref={ref}
-      >
+      <section id="services" className="section-padding relative overflow-hidden" ref={ref}>
         <div className="absolute bottom-0 left-0 w-[30rem] h-[30rem] bg-primary/5 rounded-full blur-[180px]" />
-
         <div className="container mx-auto relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -398,16 +243,9 @@ const ServicesSection = () => {
             transition={{ duration: 0.6 }}
             className="text-center mb-16"
           >
-            <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold tracking-widest uppercase mb-4">
-              What I Do
-            </span>
-            <h2 className="text-3xl md:text-5xl font-heading font-bold mb-4">
-              My <span className="gradient-text">Services</span>
-            </h2>
-            <p className="text-muted-foreground max-w-md mx-auto">
-              Premium video editing services tailored for brands that want to
-              stand out and grow.
-            </p>
+            <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold tracking-widest uppercase mb-4">What I Do</span>
+            <h2 className="text-3xl md:text-5xl font-heading font-bold mb-4">My <span className="gradient-text">Services</span></h2>
+            <p className="text-muted-foreground max-w-md mx-auto">Premium video editing services tailored for brands that want to stand out and grow.</p>
           </motion.div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -421,23 +259,15 @@ const ServicesSection = () => {
                 onClick={() => setSelected(s)}
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
                 <div className="relative z-10">
                   <div className="flex items-center justify-between mb-6">
                     <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center group-hover:bg-primary/20 group-hover:border-primary/40 transition-all duration-300">
                       <s.icon size={22} className="text-primary" />
                     </div>
-                    <span className="text-3xl font-heading font-bold text-border group-hover:text-primary/20 transition-colors">
-                      {s.num}
-                    </span>
+                    <span className="text-3xl font-heading font-bold text-border group-hover:text-primary/20 transition-colors">{s.num}</span>
                   </div>
-
-                  <h3 className="font-heading font-semibold text-lg text-foreground mb-2 group-hover:text-primary transition-colors duration-300">
-                    {s.title}
-                  </h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-                    {s.desc}
-                  </p>
+                  <h3 className="font-heading font-semibold text-lg text-foreground mb-2 group-hover:text-primary transition-colors duration-300">{s.title}</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed mb-4">{s.desc}</p>
                   <div className="flex items-center gap-1 text-primary text-xs font-medium opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300">
                     View details <ArrowUpRight size={12} />
                   </div>
@@ -449,12 +279,7 @@ const ServicesSection = () => {
       </section>
 
       <AnimatePresence>
-        {selected && (
-          <ServiceModal
-            service={selected}
-            onClose={() => setSelected(null)}
-          />
-        )}
+        {selected && <ServiceModal service={selected} onClose={() => setSelected(null)} />}
       </AnimatePresence>
     </>
   );
