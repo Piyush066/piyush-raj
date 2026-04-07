@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, ReactNode, useRef } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -27,50 +27,78 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
-
-  const checkAdmin = async (userId: string) => {
-    const { data } = await supabase.rpc("has_role", {
-      _user_id: userId,
-      _role: "admin",
-    });
-    setIsAdmin(!!data);
-  };
+  const initialized = useRef(false);
 
   useEffect(() => {
+    if (initialized.current) return;
+    initialized.current = true;
+
+    // Safety timeout – never stay stuck on loading spinner
+    const timeout = setTimeout(() => {
+      setLoading(false);
+      console.warn("[Auth] Safety timeout reached – forcing loading=false");
+    }, 5000);
+
+    // 1. Set up listener FIRST (before getSession)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      (_event, session) => {
+        console.log("[Auth] onAuthStateChange:", _event, session?.user?.email);
         setSession(session);
         setUser(session?.user ?? null);
+
         if (session?.user) {
-          await checkAdmin(session.user.id);
+          // Fire-and-forget – never await inside onAuthStateChange
+          supabase.rpc("has_role", { _user_id: session.user.id, _role: "admin" })
+            .then(({ data, error }) => {
+              if (error) console.error("[Auth] has_role error:", error);
+              setIsAdmin(!!data);
+              setLoading(false);
+              clearTimeout(timeout);
+            });
         } else {
           setIsAdmin(false);
+          setLoading(false);
+          clearTimeout(timeout);
         }
-        setLoading(false);
       }
     );
 
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        await checkAdmin(session.user.id);
+    // 2. Restore existing session
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      if (error) {
+        console.error("[Auth] getSession error:", error);
+        setLoading(false);
+        clearTimeout(timeout);
+        return;
       }
-      setLoading(false);
+      // If no session and listener hasn't fired yet, stop loading
+      if (!session) {
+        setLoading(false);
+        clearTimeout(timeout);
+      }
+      // If session exists, the onAuthStateChange listener will handle it
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(timeout);
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) return { error: error.message };
+    if (error) {
+      console.error("[Auth] signIn error:", error.message);
+      return { error: error.message };
+    }
     return { error: null };
   };
 
   const signOut = async () => {
     await supabase.auth.signOut();
     setIsAdmin(false);
+    setUser(null);
+    setSession(null);
   };
 
   return (
