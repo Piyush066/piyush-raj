@@ -15,7 +15,8 @@ const emptyService: Partial<Service> = {
 };
 
 const ServiceManager = () => {
-  const { data: services, loading } = useRealtimeTable<Service>("services", "display_order", true);
+  const { data: rawServices, loading } = useRealtimeTable<Service>("services", "display_order", true);
+  const services = [...rawServices].sort((a, b) => (a.display_order ?? 999) - (b.display_order ?? 999));
   const [editing, setEditing] = useState<Partial<Service> | null>(null);
   const [saving, setSaving] = useState(false);
 
