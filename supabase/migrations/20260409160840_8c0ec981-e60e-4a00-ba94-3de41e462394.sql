@@ -1,0 +1,1 @@
+ALTER TABLE public.portfolio_videos DROP CONSTRAINT IF EXISTS portfolio_videos_category_check;
