@@ -11,11 +11,15 @@ type Service = Tables<"services">;
 const emptyService: Partial<Service> = {
   title: "", description: "", icon_name: "Film", num: "01",
   summary: "", features: [], process_steps: [], audience: [], results: [],
-  turnaround: "", example_title: "", display_order: 0,
+  turnaround: "", example_title: "", display_order: 999,
 };
 
 const ServiceManager = () => {
-  const { data: services, loading } = useRealtimeTable<Service>("services", "display_order", true);
+  const { data: rawServices, loading } = useRealtimeTable<Service>("services", "display_order", true);
+  const services = [...rawServices].sort((a, b) => Number(a.display_order ?? 999) - Number(b.display_order ?? 999));
+
+  console.log("Sorted services:", services.map((s) => Number(s.display_order ?? 999)));
+
   const [editing, setEditing] = useState<Partial<Service> | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -34,7 +38,7 @@ const ServiceManager = () => {
       results: editing.results || [],
       turnaround: editing.turnaround || null,
       example_title: editing.example_title || null,
-      display_order: parseInt(String(editing.display_order || 0), 10),
+      display_order: parseInt(String(editing.display_order), 10) || 999,
     };
     if (editing.id) {
       await supabase.from("services").update(payload).eq("id", editing.id);
