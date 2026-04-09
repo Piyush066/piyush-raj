@@ -35,7 +35,7 @@ const ServiceManager = () => {
       results: editing.results || [],
       turnaround: editing.turnaround || null,
       example_title: editing.example_title || null,
-      display_order: parseInt(String(editing.display_order || 0), 10),
+      display_order: parseInt(String(editing.display_order), 10) || 999,
     };
     if (editing.id) {
       await supabase.from("services").update(payload).eq("id", editing.id);
