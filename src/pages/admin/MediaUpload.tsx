@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Plus, Edit2, Trash2, ExternalLink, X, Loader2 } from "lucide-react";
 import { useRealtimeTable } from "@/hooks/useRealtimeTable";
 import { Skeleton } from "@/components/ui/skeleton";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Video = Tables<"portfolio_videos">;
@@ -15,7 +15,7 @@ function getYouTubeId(url: string): string | null {
 }
 
 const MediaUpload = () => {
-  const { data: videos, loading: loadingVideos } = useRealtimeTable<Video>("portfolio_videos", "display_order", true);
+  const { data: videos, loading: loadingVideos, refetch: refetchVideos } = useRealtimeTable<Video>("portfolio_videos", "display_order", true);
   const { data: sections, loading: loadingSections } = useRealtimeTable<Section>("portfolio_sections", "display_order", true);
   const [editing, setEditing] = useState<Partial<Video> | null>(null);
   const [saving, setSaving] = useState(false);
@@ -26,8 +26,14 @@ const MediaUpload = () => {
   const filtered = filter === "All" ? videos : videos.filter((v) => v.section_id === filter);
 
   const handleSave = async () => {
-    if (!editing?.title || !editing?.section_id) return;
+    if (!editing?.title || !editing?.section_id) {
+      toast.error("Please fill all required fields (title and section).");
+      return;
+    }
+
     setSaving(true);
+    toast.loading("Saving video...", { id: "video-save" });
+
     const section = sections.find((s) => s.id === editing.section_id);
     const payload = {
       title: editing.title,
@@ -39,20 +45,46 @@ const MediaUpload = () => {
       display_order: editing.display_order || 0,
     };
 
-    if (editing.id) {
-      await supabase.from("portfolio_videos").update(payload).eq("id", editing.id);
-    } else {
-      await supabase.from("portfolio_videos").insert(payload);
+    console.log("Uploading video:", payload);
+
+    try {
+      let response;
+      if (editing.id) {
+        response = await supabase.from("portfolio_videos").update(payload).eq("id", editing.id);
+      } else {
+        response = await supabase.from("portfolio_videos").insert(payload);
+      }
+
+      console.log("Insert/Update response:", response);
+
+      if (response.error) {
+        console.error("Supabase error:", response.error);
+        toast.error("❌ Upload failed. Please try again.", { id: "video-save" });
+        setSaving(false);
+        return;
+      }
+
+      await refetchVideos();
+      toast.success("✅ Video saved successfully!", { id: "video-save" });
+      setEditing(null);
+    } catch (err) {
+      console.error("Unexpected error:", err);
+      toast.error("❌ Upload failed. Please try again.", { id: "video-save" });
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
-    setEditing(null);
-    toast({ title: "Changes saved and published." });
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this video?")) return;
-    await supabase.from("portfolio_videos").delete().eq("id", id);
-    toast({ title: "Video deleted." });
+    const { error } = await supabase.from("portfolio_videos").delete().eq("id", id);
+    if (error) {
+      console.error("Delete error:", error);
+      toast.error("Failed to delete video.");
+      return;
+    }
+    await refetchVideos();
+    toast.success("Video deleted.");
   };
 
   return (
@@ -82,18 +114,18 @@ const MediaUpload = () => {
       )}
 
       {editing && (
-        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setEditing(null)}>
+        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => !saving && setEditing(null)}>
           <div className="glass-card rounded-2xl border border-border w-full max-w-lg p-6 space-y-4" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between">
               <h2 className="font-heading font-bold text-lg text-foreground">{editing.id ? "Edit Video" : "Add Video"}</h2>
-              <button onClick={() => setEditing(null)} className="w-8 h-8 rounded-lg bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-foreground"><X size={14} /></button>
+              <button onClick={() => !saving && setEditing(null)} className="w-8 h-8 rounded-lg bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-foreground"><X size={14} /></button>
             </div>
-            <div><label className="text-xs text-muted-foreground font-medium mb-1 block">Title</label><input value={editing.title || ""} onChange={(e) => setEditing({ ...editing, title: e.target.value })} className="w-full bg-secondary border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:border-primary/50 outline-none" /></div>
-            <div><label className="text-xs text-muted-foreground font-medium mb-1 block">Section</label><select value={editing.section_id || ""} onChange={(e) => setEditing({ ...editing, section_id: e.target.value })} className="w-full bg-secondary border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:border-primary/50 outline-none"><option value="">Select...</option>{sections.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}</select></div>
+            <div><label className="text-xs text-muted-foreground font-medium mb-1 block">Title *</label><input value={editing.title || ""} onChange={(e) => setEditing({ ...editing, title: e.target.value })} className="w-full bg-secondary border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:border-primary/50 outline-none" /></div>
+            <div><label className="text-xs text-muted-foreground font-medium mb-1 block">Section *</label><select value={editing.section_id || ""} onChange={(e) => setEditing({ ...editing, section_id: e.target.value })} className="w-full bg-secondary border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:border-primary/50 outline-none"><option value="">Select...</option>{sections.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}</select></div>
             <div><label className="text-xs text-muted-foreground font-medium mb-1 block">YouTube URL</label><input value={editing.youtube_url || ""} onChange={(e) => setEditing({ ...editing, youtube_url: e.target.value })} className="w-full bg-secondary border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:border-primary/50 outline-none" placeholder="https://youtube.com/..." /></div>
             <div><label className="text-xs text-muted-foreground font-medium mb-1 block">Custom Thumbnail URL</label><input value={editing.thumbnail_url || ""} onChange={(e) => setEditing({ ...editing, thumbnail_url: e.target.value })} className="w-full bg-secondary border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:border-primary/50 outline-none" placeholder="Optional" /></div>
             <div><label className="text-xs text-muted-foreground font-medium mb-1 block">Display Order</label><input type="number" value={editing.display_order || 0} onChange={(e) => setEditing({ ...editing, display_order: parseInt(e.target.value) || 0 })} className="w-full bg-secondary border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:border-primary/50 outline-none" /></div>
-            <button onClick={handleSave} disabled={saving} className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:brightness-110 transition-all flex items-center justify-center gap-2">
+            <button onClick={handleSave} disabled={saving} className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:brightness-110 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
               {saving && <Loader2 size={16} className="animate-spin" />} {saving ? "Saving..." : "Save & Publish"}
             </button>
           </div>
