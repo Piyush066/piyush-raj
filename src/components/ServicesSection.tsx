@@ -230,11 +230,12 @@ const ServicesSection = () => {
 
   const { data: dbServices, loading } = useRealtimeTable<Tables<"services">>("services", "display_order", true);
 
-  const services: ServiceData[] = [...(dbServices.length > 0 ? dbServices : fallbackServices)]
-    .sort((a, b) => (("display_order" in a ? a.display_order : undefined) ?? 999) - ((("display_order" in b ? b.display_order : undefined) ?? 999)))
+  const servicesSource = dbServices.length > 0 ? dbServices : fallbackServices;
+  const services: ServiceData[] = [...servicesSource]
+    .sort((a, b) => Number(("display_order" in a ? a.display_order : undefined) ?? 999) - Number(("display_order" in b ? b.display_order : undefined) ?? 999))
     .map(mapService);
 
-  console.log("Sorted services:", (dbServices.length > 0 ? dbServices : fallbackServices).map((s) => ("display_order" in s ? s.display_order ?? 999 : 999)).sort((a, b) => a - b));
+  console.log("Sorted services:", servicesSource.map((s) => Number(("display_order" in s ? s.display_order : undefined) ?? 999)).sort((a, b) => a - b));
 
   return (
     <>

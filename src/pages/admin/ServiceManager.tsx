@@ -11,12 +11,15 @@ type Service = Tables<"services">;
 const emptyService: Partial<Service> = {
   title: "", description: "", icon_name: "Film", num: "01",
   summary: "", features: [], process_steps: [], audience: [], results: [],
-  turnaround: "", example_title: "", display_order: 0,
+  turnaround: "", example_title: "", display_order: 999,
 };
 
 const ServiceManager = () => {
   const { data: rawServices, loading } = useRealtimeTable<Service>("services", "display_order", true);
-  const services = [...rawServices].sort((a, b) => (a.display_order ?? 999) - (b.display_order ?? 999));
+  const services = [...rawServices].sort((a, b) => Number(a.display_order ?? 999) - Number(b.display_order ?? 999));
+
+  console.log("Sorted services:", services.map((s) => Number(s.display_order ?? 999)));
+
   const [editing, setEditing] = useState<Partial<Service> | null>(null);
   const [saving, setSaving] = useState(false);
 
