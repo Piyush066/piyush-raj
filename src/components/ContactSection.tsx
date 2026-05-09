@@ -21,7 +21,7 @@ const EMAILJS_PUBLIC_KEY = "IhpAE6nokuTqdwsfF";
 const contactInfo = [
   { icon: Mail, label: "rajpiyush9572@gmail.com", href: "mailto:rajpiyush9572@gmail.com", color: "from-primary/20 to-orange-600/5" },
   { icon: Phone, label: "6204285965", href: "tel:6204285965", color: "from-orange-500/20 to-amber-500/5" },
-  { icon: Linkedin, label: "LinkedIn Profile", href: "https://www.linkedin.com/in/piyushraj006", color: "from-blue-500/20 to-blue-600/5" },
+  { icon: Linkedin, label: "LinkedIn Profile", href: "www.linkedin.com/in/piyushraj006", color: "from-blue-500/20 to-blue-600/5" },
   { icon: Github, label: "GitHub Profile", href: "https://github.com/Piyush066", color: "from-muted/30 to-muted/5" },
   { icon: MapPin, label: "Koderma, Jharkhand, India", href: "#", color: "from-amber-500/20 to-orange-500/5" },
 ];
